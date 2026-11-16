@@ -1,5 +1,8 @@
 package Models;
 
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -8,6 +11,7 @@ public class Alumno {
     private String apellido;
     private Integer anioIngreso;    // No obligatorio
     private UUID id;
+    private HashMap<Year, ArrayList<Comision>> historial;
 
     public Alumno(String nombre, String apellido, Integer anioIngreso) {
         this.nombre = nombre;
