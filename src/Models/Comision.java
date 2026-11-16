@@ -37,6 +37,16 @@ public class Comision implements ICursable {
     }
 
     @Override
+    public String listarAlumnos() {
+        StringBuilder sb = new StringBuilder();
+        for (Alumno alumno : alumnos) {
+            sb.append(alumno.getId());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Comision comision)) return false;
         return Objects.equals(nombreComision, comision.nombreComision);

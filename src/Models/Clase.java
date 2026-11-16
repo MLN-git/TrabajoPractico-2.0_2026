@@ -30,6 +30,15 @@ public class Clase implements ICursable {
         return alumnos.remove(alumno);
     }
 
+    @Override
+    public String listarAlumnos() {
+        StringBuilder sb = new StringBuilder();
+        for (Alumno alumno : alumnos) {
+            sb.append(alumno.getId());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 
 
     public Date getFechaYHora() {

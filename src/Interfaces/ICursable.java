@@ -6,5 +6,6 @@ public interface ICursable {
 
     public Boolean agregarAlumno(Alumno alumno);
     public Boolean eliminarAlumno(Alumno alumno);
+    public String listarAlumnos();
 
 }

@@ -4,10 +4,10 @@ import Interfaces.ICursable;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.UUID;
 
 public class Materia <T extends ICursable>{
-    private Integer id;
-    private static Integer idTotal=0;
+    private UUID id;
     private String nombre;
     private Institucion institucion;
     private HashSet<T> Aulas;
@@ -15,7 +15,7 @@ public class Materia <T extends ICursable>{
     public Materia(String nombre, Institucion institucion) {
         this.nombre = nombre;
         this.institucion = institucion;
-        this.id = idTotal++;
+        this.id = UUID.randomUUID();
         Aulas = new HashSet<T>();
     }
 
@@ -31,13 +31,10 @@ public class Materia <T extends ICursable>{
         return Objects.hashCode(id);
     }
 
-    public Integer getId() {
+    public UUID getId() {
         return id;
     }
 
-    public static Integer getIdTotal() {
-        return idTotal;
-    }
 
     public String getNombre() {
         return nombre;
