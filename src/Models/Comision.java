@@ -4,10 +4,7 @@ import Enums.EDiaSemana;
 import Interfaces.ICursable;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
 
 public class Comision implements ICursable {
     private Date horaInicio;
@@ -15,6 +12,7 @@ public class Comision implements ICursable {
     private EDiaSemana diaSemana;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
+    private HashMap<Date, HashSet<Alumno>> asistencias;
     private Year anio;
 
     public Comision(Date horaInicio, Date horaFin, EDiaSemana diaSemana, String nombreComision, HashSet<Alumno> alumnos, Year anio) {
