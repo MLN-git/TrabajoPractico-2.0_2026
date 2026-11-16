@@ -1,8 +1,11 @@
 package Models;
 
-import java.util.HashSet;
+import Interfaces.ICursable;
 
-public class Materia <T>{
+import java.util.HashSet;
+import java.util.Objects;
+
+public class Materia <T extends ICursable>{
     private Integer id;
     private static Integer idTotal=0;
     private String nombre;
@@ -17,4 +20,46 @@ public class Materia <T>{
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Materia<?> materia)) return false;
+        return Objects.equals(id, materia.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public static Integer getIdTotal() {
+        return idTotal;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Institucion getInstitucion() {
+        return institucion;
+    }
+
+    public void setInstitucion(Institucion institucion) {
+        this.institucion = institucion;
+    }
+
+    public HashSet<T> getAulas() {
+        return Aulas;
+    }
+
+    public void setAulas(HashSet<T> aulas) {
+        Aulas = aulas;
+    }
 }

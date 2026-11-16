@@ -1,16 +1,36 @@
 package Models;
 
+import Interfaces.ICursable;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 
-public class Clase {
+public class Clase implements ICursable {
     private Date fechaYHora;
     private String nombre;
+    private HashSet<Alumno> alumnos;
 
     public Clase(Date fechaYHora, String nombre) {
         this.fechaYHora = fechaYHora;
         this.nombre = nombre;
+        this.alumnos = new HashSet<>();
     }
+
+
+
+    @Override
+    public Boolean agregarAlumno(Alumno alumno) {
+        return alumnos.add(alumno);
+    }
+
+    @Override
+    public Boolean eliminarAlumno(Alumno alumno) {
+        return alumnos.remove(alumno);
+    }
+
+
 
     public Date getFechaYHora() {
         return fechaYHora;
