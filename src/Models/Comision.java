@@ -4,23 +4,26 @@ import Enums.EDiaSemana;
 import Exceptions.AlumnosVacioException;
 import Interfaces.ICursable;
 
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.*;
 
 import static Gestores.Menu.consultarAlumno;
+import static menu.Verificador.queDiaEs;
 
 public class Comision implements ICursable {
     private EDiaSemana diaSemana;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
-    private HashMap<Date, HashSet<Alumno>> asistencias;
+    private HashMap<LocalDate, HashSet<Alumno>> asistencias;
     private Year anio;
 
-    public Comision(EDiaSemana diaSemana, String nombreComision, HashSet<Alumno> alumnos, Year anio) {
+    public Comision(EDiaSemana diaSemana, String nombreComision, Year anio) {
         this.diaSemana = diaSemana;
         this.nombreComision = nombreComision;
-        this.alumnos = alumnos;
+        this.alumnos = new HashSet<>();
         this.anio = anio;
+        this.asistencias = new HashMap<>();
     }
 
 
@@ -29,27 +32,40 @@ public class Comision implements ICursable {
         if (alumnos.isEmpty()){
             throw new AlumnosVacioException("No hay alumnos asignados a la clase");
         }
-        if (this.asistencias == null) {
-            this.asistencias = new HashSet<>();
+        LocalDate hoy = queDiaEs();
+
+        if (!(this.asistencias.containsKey(hoy))) {
+            HashSet<Alumno> asistenciaHoy = new HashSet<>();
             for (Alumno alumno : this.alumnos) {
                 if (consultarAlumno(alumno)){
-                    this.asistencias.add(alumno);
+                    asistenciaHoy.add(alumno);
                 }
             }
+            this.asistencias.put(hoy, asistenciaHoy);
         }
     }
 
     @Override
     public String listarAsistencias() throws AlumnosVacioException {
-        if (this.asistencia == null || asistencia.isEmpty()){
+        if (asistencias.containsKey(queDiaEs()) || asistencias.get(queDiaEs()).isEmpty()){
             throw new AlumnosVacioException("Nadie asistió todavía");
         }
         StringBuilder s = new StringBuilder();
-        for  (Alumno alumno : this.asistencia) {
+        for  (Alumno alumno : asistencias.get(queDiaEs())) {
             s.append(alumno.nombreCompleto());
             s.append("\n");
         }
         return s.toString();
+    }
+
+    @Override
+    public Boolean agregarPresente(Alumno alumno) {
+        return asistencias.get(queDiaEs()).add(alumno);
+    }
+
+    @Override
+    public Boolean eliminarPresente(Alumno alumno) {
+        return asistencias.get(queDiaEs()).remove(alumno);
     }
 
     @Override

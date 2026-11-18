@@ -10,7 +10,7 @@ public interface ICursable {
     public String listarAlumnos();
     public void tomarAsistencia() throws AlumnosVacioException;
     public String listarAsistencias() throws AlumnosVacioException;
-    public Boolean agregarPresente();
-    public Boolean eliminarPresente();
+    public Boolean agregarPresente(Alumno alumno);
+    public Boolean eliminarPresente(Alumno alumno);
 
 }

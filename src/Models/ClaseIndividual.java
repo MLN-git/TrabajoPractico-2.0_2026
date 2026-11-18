@@ -9,13 +9,13 @@ import java.util.Objects;
 
 import static Gestores.Menu.consultarAlumno;
 
-public class Clase implements ICursable {
+public class ClaseIndividual implements ICursable {
     private Date fechaYHora;
     private String nombre;
     private HashSet<Alumno> alumnos;
     private HashSet<Alumno> asistencia;
 
-    public Clase(Date fechaYHora, String nombre) {
+    public ClaseIndividual(Date fechaYHora, String nombre) {
         this.fechaYHora = fechaYHora;
         this.nombre = nombre;
         this.alumnos = new HashSet<>();
@@ -50,7 +50,15 @@ public class Clase implements ICursable {
         return s.toString();
     }
 
+    @Override
+    public Boolean agregarPresente(Alumno alumno) {
+        return asistencia.add(alumno);
+    }
 
+    @Override
+    public Boolean eliminarPresente(Alumno alumno) {
+        return asistencia.remove(alumno);
+    }
 
     @Override
     public Boolean agregarAlumno(Alumno alumno) {
@@ -91,8 +99,8 @@ public class Clase implements ICursable {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Clase clase)) return false;
-        return Objects.equals(fechaYHora, clase.fechaYHora);
+        if (!(o instanceof ClaseIndividual claseIndividual)) return false;
+        return Objects.equals(fechaYHora, claseIndividual.fechaYHora);
     }
 
     @Override

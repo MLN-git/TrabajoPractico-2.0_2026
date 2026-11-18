@@ -1,5 +1,6 @@
 package menu;
 
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -170,6 +171,10 @@ public class Verificador {
             }
         } while (true);
 
+    }
+
+    public static LocalDate queDiaEs() {
+        return LocalDate.now();
     }
 
 }
