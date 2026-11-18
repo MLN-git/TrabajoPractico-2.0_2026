@@ -19,6 +19,13 @@ public class Materia <T extends ICursable>{
         Aulas = new HashSet<T>();
     }
 
+    public Materia(UUID id, String nombre, Institucion institucion) {
+        this.id = id;
+        this.nombre = nombre;
+        this.institucion = institucion;
+        this.Aulas = new HashSet<>();
+    }
+
 
     @Override
     public boolean equals(Object o) {

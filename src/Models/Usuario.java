@@ -14,6 +14,12 @@ public class Usuario {
         this.id = UUID.randomUUID();
     }
 
+    public Usuario(UUID id, String nombre, String contrasenia) {
+        this.id = id;
+        this.nombre = nombre;
+        this.contrasenia = contrasenia;
+    }
+
     @Override
     public String toString() {
         return "Usuario{" +

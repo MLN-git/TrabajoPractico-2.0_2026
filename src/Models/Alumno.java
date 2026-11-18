@@ -20,6 +20,13 @@ public class Alumno {
         this.id = UUID.randomUUID();
     }
 
+    public Alumno(UUID id, String nombre, String apellido, Integer anioIngreso) {
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.anioIngreso = anioIngreso;
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Alumno alumno)) return false;
