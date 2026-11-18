@@ -1,27 +1,55 @@
 package Models;
 
 import Enums.EDiaSemana;
+import Exceptions.AlumnosVacioException;
 import Interfaces.ICursable;
 
 import java.time.Year;
 import java.util.*;
 
+import static Gestores.Menu.consultarAlumno;
+
 public class Comision implements ICursable {
-    private Date horaInicio;
-    private Date horaFin;
     private EDiaSemana diaSemana;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
     private HashMap<Date, HashSet<Alumno>> asistencias;
     private Year anio;
 
-    public Comision(Date horaInicio, Date horaFin, EDiaSemana diaSemana, String nombreComision, HashSet<Alumno> alumnos, Year anio) {
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
+    public Comision(EDiaSemana diaSemana, String nombreComision, HashSet<Alumno> alumnos, Year anio) {
         this.diaSemana = diaSemana;
         this.nombreComision = nombreComision;
         this.alumnos = alumnos;
         this.anio = anio;
+    }
+
+
+    @Override
+    public void tomarAsistencia() throws AlumnosVacioException {
+        if (alumnos.isEmpty()){
+            throw new AlumnosVacioException("No hay alumnos asignados a la clase");
+        }
+        if (this.asistencias == null) {
+            this.asistencias = new HashSet<>();
+            for (Alumno alumno : this.alumnos) {
+                if (consultarAlumno(alumno)){
+                    this.asistencias.add(alumno);
+                }
+            }
+        }
+    }
+
+    @Override
+    public String listarAsistencias() throws AlumnosVacioException {
+        if (this.asistencia == null || asistencia.isEmpty()){
+            throw new AlumnosVacioException("Nadie asistió todavía");
+        }
+        StringBuilder s = new StringBuilder();
+        for  (Alumno alumno : this.asistencia) {
+            s.append(alumno.nombreCompleto());
+            s.append("\n");
+        }
+        return s.toString();
     }
 
     @Override
@@ -53,22 +81,6 @@ public class Comision implements ICursable {
     @Override
     public int hashCode() {
         return Objects.hashCode(nombreComision);
-    }
-
-    public Date getHoraInicio() {
-        return horaInicio;
-    }
-
-    public void setHoraInicio(Date horaInicio) {
-        this.horaInicio = horaInicio;
-    }
-
-    public Date getHoraFin() {
-        return horaFin;
-    }
-
-    public void setHoraFin(Date horaFin) {
-        this.horaFin = horaFin;
     }
 
     public EDiaSemana getDiaSemana() {
