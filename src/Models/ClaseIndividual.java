@@ -50,7 +50,15 @@ public class ClaseIndividual implements ICursable {
         return s.toString();
     }
 
+    @Override
+    public Boolean agregarPresente(Alumno alumno) {
+        return asistencia.add(alumno);
+    }
 
+    @Override
+    public Boolean eliminarPresente(Alumno alumno) {
+        return asistencia.remove(alumno);
+    }
 
     @Override
     public Boolean agregarAlumno(Alumno alumno) {

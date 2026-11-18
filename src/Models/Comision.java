@@ -59,6 +59,16 @@ public class Comision implements ICursable {
     }
 
     @Override
+    public Boolean agregarPresente(Alumno alumno) {
+        return asistencias.get(queDiaEs()).add(alumno);
+    }
+
+    @Override
+    public Boolean eliminarPresente(Alumno alumno) {
+        return asistencias.get(queDiaEs()).remove(alumno);
+    }
+
+    @Override
     public Boolean agregarAlumno(Alumno alumno) {
         return alumnos.add(alumno);
     }
