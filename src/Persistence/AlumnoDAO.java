@@ -42,23 +42,20 @@ public class AlumnoDAO {
     }
 
     public Alumno obtenerAlumnoPorId(String id) throws SQLException {
-        String sql = "SELECT * FROM alumnos WHERE id = ?";
+        String sql = "SELECT id, nombre, apellido, anio_ingreso FROM alumnos WHERE id = ?";
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id);
-            var rs = ps.executeQuery();
-
-            if (rs.next()) {
-                String nombre = rs.getString("nombre");
-                String apellido = rs.getString("apellido");
-                Integer anioIngreso = rs.getInt("anio_ingreso");
-                if (rs.wasNull()) {
-                    anioIngreso = null;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Alumno(
+                            UUID.fromString(rs.getString("id")),
+                            rs.getString("nombre"),
+                            rs.getString("apellido"),
+                            rs.getObject("anio_ingreso", Integer.class)
+                    );
                 }
-                Alumno alumno = new Alumno(nombre, apellido, anioIngreso);
-                return alumno;
-            } else {
                 return null;
             }
         }
