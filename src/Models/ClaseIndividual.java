@@ -11,18 +11,49 @@ import java.util.UUID;
 import static Gestores.Menu.consultarAlumno;
 
 public class ClaseIndividual implements ICursable {
+    private UUID id;
     private Date fechaYHora;
     private String nombre;
     private HashSet<Alumno> alumnos;
     private HashSet<Alumno> asistencia;
+    private boolean asistenciaTomada;
 
     public ClaseIndividual(Date fechaYHora, String nombre) {
+        this(UUID.randomUUID(), fechaYHora, nombre);
+    }
+
+    public ClaseIndividual(UUID id, Date fechaYHora, String nombre) {
+        this.id = id;
         this.fechaYHora = fechaYHora;
         this.nombre = nombre;
         this.alumnos = new HashSet<>();
         this.asistencia = new HashSet<>();
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public HashSet<Alumno> getAlumnos() {
+        return alumnos;
+    }
+
+    public HashSet<Alumno> getAsistencia() {
+        return asistencia;
+    }
+
+    public void setAsistencia(HashSet<Alumno> asistencia) {
+        this.asistencia = asistencia;
+        this.asistenciaTomada = true;
+    }
+
+    public boolean isAsistenciaTomada() {
+        return asistenciaTomada;
+    }
+
+    public void marcarAsistenciaTomada() {
+        this.asistenciaTomada = true;
+    }
 
     @Override
     public void tomarAsistencia() throws AlumnosVacioException {
@@ -35,6 +66,7 @@ public class ClaseIndividual implements ICursable {
                 this.asistencia.add(alumno);
             }
         }
+        this.asistenciaTomada = true;
     }
 
     @Override
@@ -55,6 +87,7 @@ public class ClaseIndividual implements ICursable {
         if (!alumnos.contains(alumno)) {
             return false;
         }
+        asistenciaTomada = true;
         return asistencia.add(alumno);
     }
 
@@ -73,7 +106,11 @@ public class ClaseIndividual implements ICursable {
 
     @Override
     public Boolean eliminarAlumno(Alumno alumno) {
-        return alumnos.remove(alumno);
+        boolean eliminado = alumnos.remove(alumno);
+        if (eliminado) {
+            asistencia.remove(alumno);
+        }
+        return eliminado;
     }
 
     @Override
@@ -106,11 +143,11 @@ public class ClaseIndividual implements ICursable {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ClaseIndividual claseIndividual)) return false;
-        return Objects.equals(fechaYHora, claseIndividual.fechaYHora);
+        return Objects.equals(id, claseIndividual.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fechaYHora);
+        return Objects.hashCode(id);
     }
 }

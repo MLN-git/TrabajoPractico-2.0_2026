@@ -11,18 +11,35 @@ import static Gestores.Menu.consultarAlumno;
 import static menu.Verificador.queDiaEs;
 
 public class Comision implements ICursable {
+    private UUID id;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
     private HashMap<LocalDate, HashSet<Alumno>> asistencias;
     private Year anio;
 
     public Comision(String nombreComision, Year anio) {
+        this(UUID.randomUUID(), nombreComision, anio);
+    }
+
+    public Comision(UUID id, String nombreComision, Year anio) {
+        this.id = id;
         this.nombreComision = nombreComision;
         this.alumnos = new HashSet<>();
         this.anio = anio;
         this.asistencias = new HashMap<>();
     }
 
+    public UUID getId() {
+        return id;
+    }
+
+    public HashMap<LocalDate, HashSet<Alumno>> getAsistencias() {
+        return asistencias;
+    }
+
+    public void cargarAsistencia(LocalDate fecha, HashSet<Alumno> presentes) {
+        asistencias.put(fecha, presentes);
+    }
 
     @Override
     public void tomarAsistencia() throws AlumnosVacioException {
@@ -58,6 +75,9 @@ public class Comision implements ICursable {
 
     @Override
     public Boolean agregarPresente(Alumno alumno) {
+        if (!alumnos.contains(alumno)) {
+            return false;
+        }
         return asistencias.computeIfAbsent(queDiaEs(), dia -> new HashSet<>()).add(alumno);
     }
 
@@ -90,12 +110,12 @@ public class Comision implements ICursable {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Comision comision)) return false;
-        return Objects.equals(nombreComision, comision.nombreComision);
+        return Objects.equals(id, comision.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(nombreComision);
+        return Objects.hashCode(id);
     }
 
     public String getNombreComision() {

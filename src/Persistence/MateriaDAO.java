@@ -97,4 +97,26 @@ public class MateriaDAO {
         }
         return materias;
     }
+
+    public Materia<ICursable> obtenerCompletaPorId(UUID id) throws SQLException {
+        Materia<ICursable> materia = obtenerMateriaPorId(id);
+        if (materia == null) {
+            return null;
+        }
+
+        if (materia.getTipoMateria() == ETipoMateria.INDIVIDUAL) {
+            materia.getICursables().addAll(new ClaseIndividualDAO().listarPorMateria(id));
+        } else if (materia.getTipoMateria() == ETipoMateria.COMISIONADA) {
+            materia.getICursables().addAll(new ComisionDAO().listarPorMateria(id));
+        }
+        return materia;
+    }
+
+    public List<Materia<ICursable>> listarCompletas() throws SQLException {
+        List<Materia<ICursable>> materiasCompletas = new ArrayList<>();
+        for (Materia<ICursable> materia : listar()) {
+            materiasCompletas.add(obtenerCompletaPorId(materia.getId()));
+        }
+        return materiasCompletas;
+    }
 }

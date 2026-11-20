@@ -59,6 +59,79 @@ public final class ConexionDB {
                         tipo_materia VARCHAR(30) NOT NULL
                     )
                     """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS cursables (
+                        id CHAR(36) PRIMARY KEY,
+                        materia_id CHAR(36) NOT NULL,
+                        tipo VARCHAR(30) NOT NULL,
+                        nombre VARCHAR(100) NOT NULL,
+                        CONSTRAINT fk_cursables_materia
+                            FOREIGN KEY (materia_id) REFERENCES materias(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS clases_individuales (
+                        cursable_id CHAR(36) PRIMARY KEY,
+                        fecha_y_hora DATETIME NOT NULL,
+                        CONSTRAINT fk_clase_cursable
+                            FOREIGN KEY (cursable_id) REFERENCES cursables(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS comisiones (
+                        cursable_id CHAR(36) PRIMARY KEY,
+                        anio INT NOT NULL,
+                        CONSTRAINT fk_comision_cursable
+                            FOREIGN KEY (cursable_id) REFERENCES cursables(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS cursable_alumnos (
+                        cursable_id CHAR(36) NOT NULL,
+                        alumno_id CHAR(36) NOT NULL,
+                        PRIMARY KEY (cursable_id, alumno_id),
+                        CONSTRAINT fk_cursable_alumnos_cursable
+                            FOREIGN KEY (cursable_id) REFERENCES cursables(id)
+                            ON DELETE CASCADE,
+                        CONSTRAINT fk_cursable_alumnos_alumno
+                            FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS asistencia_sesiones (
+                        id CHAR(36) PRIMARY KEY,
+                        cursable_id CHAR(36) NOT NULL,
+                        fecha DATE NOT NULL,
+                        UNIQUE KEY uq_asistencia_cursable_fecha (cursable_id, fecha),
+                        CONSTRAINT fk_asistencia_sesion_cursable
+                            FOREIGN KEY (cursable_id) REFERENCES cursables(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
+
+            sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS asistencia_detalle (
+                        sesion_id CHAR(36) NOT NULL,
+                        alumno_id CHAR(36) NOT NULL,
+                        presente BOOLEAN NOT NULL,
+                        PRIMARY KEY (sesion_id, alumno_id),
+                        CONSTRAINT fk_asistencia_detalle_sesion
+                            FOREIGN KEY (sesion_id) REFERENCES asistencia_sesiones(id)
+                            ON DELETE CASCADE,
+                        CONSTRAINT fk_asistencia_detalle_alumno
+                            FOREIGN KEY (alumno_id) REFERENCES alumnos(id)
+                            ON DELETE CASCADE
+                    )
+                    """);
         }
 
         inicializada = true;
