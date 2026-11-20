@@ -6,6 +6,7 @@ import Interfaces.ICursable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.UUID;
 
 import static Gestores.Menu.consultarAlumno;
 

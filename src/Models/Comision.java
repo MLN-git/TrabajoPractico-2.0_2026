@@ -1,6 +1,5 @@
 package Models;
 
-import Enums.EDiaSemana;
 import Exceptions.AlumnosVacioException;
 import Interfaces.ICursable;
 
@@ -12,14 +11,12 @@ import static Gestores.Menu.consultarAlumno;
 import static menu.Verificador.queDiaEs;
 
 public class Comision implements ICursable {
-    private EDiaSemana diaSemana;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
     private HashMap<LocalDate, HashSet<Alumno>> asistencias;
     private Year anio;
 
-    public Comision(EDiaSemana diaSemana, String nombreComision, Year anio) {
-        this.diaSemana = diaSemana;
+    public Comision(String nombreComision, Year anio) {
         this.nombreComision = nombreComision;
         this.alumnos = new HashSet<>();
         this.anio = anio;
@@ -99,20 +96,8 @@ public class Comision implements ICursable {
         return Objects.hashCode(nombreComision);
     }
 
-    public EDiaSemana getDiaSemana() {
-        return diaSemana;
-    }
-
-    public void setDiaSemana(EDiaSemana diaSemana) {
-        this.diaSemana = diaSemana;
-    }
-
     public String getNombreComision() {
         return nombreComision;
-    }
-
-    public void setNombreComision(String nombreComision) {
-        this.nombreComision = nombreComision;
     }
 
     public HashSet<Alumno> getAlumnos() {

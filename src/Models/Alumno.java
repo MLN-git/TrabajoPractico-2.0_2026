@@ -11,7 +11,7 @@ public class Alumno {
     private String apellido;
     private Integer anioIngreso;    // No obligatorio
     private UUID id;
-    private HashMap<Year, ArrayList<String>> historial;
+
 
     public Alumno(String nombre, String apellido, Integer anioIngreso) {
         this.nombre = nombre;
