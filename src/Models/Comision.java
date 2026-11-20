@@ -44,11 +44,12 @@ public class Comision implements ICursable {
 
     @Override
     public String listarAsistencias() throws AlumnosVacioException {
-        if (asistencias.containsKey(queDiaEs()) || asistencias.get(queDiaEs()).isEmpty()){
+        HashSet<Alumno> asistenciaHoy = asistencias.get(queDiaEs());
+        if (asistenciaHoy == null || asistenciaHoy.isEmpty()) {
             throw new AlumnosVacioException("Nadie asistió todavía");
         }
         StringBuilder s = new StringBuilder();
-        for  (Alumno alumno : asistencias.get(queDiaEs())) {
+        for (Alumno alumno : asistenciaHoy) {
             s.append(alumno.nombreCompleto());
             s.append("\n");
         }
@@ -57,12 +58,13 @@ public class Comision implements ICursable {
 
     @Override
     public Boolean agregarPresente(Alumno alumno) {
-        return asistencias.get(queDiaEs()).add(alumno);
+        return asistencias.computeIfAbsent(queDiaEs(), dia -> new HashSet<>()).add(alumno);
     }
 
     @Override
     public Boolean eliminarPresente(Alumno alumno) {
-        return asistencias.get(queDiaEs()).remove(alumno);
+        HashSet<Alumno> asistenciaHoy = asistencias.get(queDiaEs());
+        return asistenciaHoy != null && asistenciaHoy.remove(alumno);
     }
 
     @Override
