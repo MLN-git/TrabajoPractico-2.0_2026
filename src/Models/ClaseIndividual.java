@@ -20,6 +20,7 @@ public class ClaseIndividual implements ICursable {
         this.fechaYHora = fechaYHora;
         this.nombre = nombre;
         this.alumnos = new HashSet<>();
+        this.asistencia = new HashSet<>();
     }
 
 
@@ -28,12 +29,10 @@ public class ClaseIndividual implements ICursable {
         if (alumnos.isEmpty()){
             throw new AlumnosVacioException("No hay alumnos asignados a la clase");
         }
-        if (this.asistencia == null) {
-            this.asistencia = new HashSet<>();
-            for (Alumno alumno : this.alumnos) {
-                if (consultarAlumno(alumno)){
-                    this.asistencia.add(alumno);
-                }
+        this.asistencia.clear();
+        for (Alumno alumno : this.alumnos) {
+            if (consultarAlumno(alumno)) {
+                this.asistencia.add(alumno);
             }
         }
     }
@@ -53,11 +52,17 @@ public class ClaseIndividual implements ICursable {
 
     @Override
     public Boolean agregarPresente(Alumno alumno) {
+        if (!alumnos.contains(alumno)) {
+            return false;
+        }
         return asistencia.add(alumno);
     }
 
     @Override
     public Boolean eliminarPresente(Alumno alumno) {
+        if (asistencia == null) {
+            return false;
+        }
         return asistencia.remove(alumno);
     }
 
