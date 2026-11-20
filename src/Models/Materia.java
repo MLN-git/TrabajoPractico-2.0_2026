@@ -10,20 +10,20 @@ public class Materia <T extends ICursable>{
     private UUID id;
     private String nombre;
     private Institucion institucion;
-    private HashSet<T> Aulas;
+    private HashSet<T> iCursables;
 
     public Materia(String nombre, Institucion institucion) {
         this.nombre = nombre;
         this.institucion = institucion;
         this.id = UUID.randomUUID();
-        Aulas = new HashSet<T>();
+        iCursables = new HashSet<T>();
     }
 
     public Materia(UUID id, String nombre, Institucion institucion) {
         this.id = id;
         this.nombre = nombre;
         this.institucion = institucion;
-        this.Aulas = new HashSet<>();
+        this.iCursables = new HashSet<>();
     }
 
 
@@ -59,11 +59,11 @@ public class Materia <T extends ICursable>{
         this.institucion = institucion;
     }
 
-    public HashSet<T> getAulas() {
-        return Aulas;
+    public HashSet<T> getICursables() {
+        return iCursables;
     }
 
-    public void setAulas(HashSet<T> aulas) {
-        Aulas = aulas;
+    public void setICursables(HashSet<T> aulas) {
+        iCursables = aulas;
     }
 }
