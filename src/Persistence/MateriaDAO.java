@@ -1,5 +1,6 @@
 package Persistence;
 
+import Enums.ETipoMateria;
 import Interfaces.ICursable;
 import Models.Materia;
 
@@ -11,21 +12,13 @@ import java.util.UUID;
 
 public class MateriaDAO {
     public void guardarMateria(Materia<? extends ICursable> materia) throws SQLException {
-        String sql = "INSERT INTO materias "
-                + "(id, nombre, institucion_nombre, institucion_domicilio) "
-                + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO materias (id, nombre, tipo_materia) VALUES (?, ?, ?)";
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, materia.getId().toString());
             ps.setString(2, materia.getNombre());
-            if (materia.getInstitucion() == null) {
-                ps.setNull(3, Types.VARCHAR);
-                ps.setNull(4, Types.VARCHAR);
-            } else {
-                ps.setString(3, materia.getInstitucion().getNombre());
-                ps.setString(4, materia.getInstitucion().getDomicilio());
-            }
+            ps.setString(3, materia.getTipoMateria().name());
             ps.executeUpdate();
         }
     }
@@ -41,22 +34,17 @@ public class MateriaDAO {
     }
 
     public Materia<ICursable> obtenerMateriaPorId(UUID id) throws SQLException {
-        String sql = "SELECT * FROM materias WHERE id = ?";
+        String sql = "SELECT id, nombre, tipo_materia FROM materias WHERE id = ?";
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    String nombreInstitucion = rs.getString("institucion_nombre");
-                    Institucion institucion = nombreInstitucion == null ? null : new Institucion(
-                            nombreInstitucion,
-                            rs.getString("institucion_domicilio")
-                    );
                     return new Materia<>(
                             UUID.fromString(rs.getString("id")),
                             rs.getString("nombre"),
-                            institucion
+                            ETipoMateria.valueOf(rs.getString("tipo_materia"))
                     );
                 }
                 return null;
@@ -66,9 +54,7 @@ public class MateriaDAO {
 
     public void guardarTodos(Collection<? extends Materia<? extends ICursable>> materias)
             throws SQLException {
-        String sql = "INSERT INTO materias "
-                + "(id, nombre, institucion_nombre, institucion_domicilio) "
-                + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO materias (id, nombre, tipo_materia) VALUES (?, ?, ?)";
 
         try (Connection conexion = ConexionDB.abrir()) {
             conexion.setAutoCommit(false);
@@ -77,13 +63,7 @@ public class MateriaDAO {
                 for (Materia<? extends ICursable> materia : materias) {
                     ps.setString(1, materia.getId().toString());
                     ps.setString(2, materia.getNombre());
-                    if (materia.getInstitucion() == null) {
-                        ps.setNull(3, Types.VARCHAR);
-                        ps.setNull(4, Types.VARCHAR);
-                    } else {
-                        ps.setString(3, materia.getInstitucion().getNombre());
-                        ps.setString(4, materia.getInstitucion().getDomicilio());
-                    }
+                    ps.setString(3, materia.getTipoMateria().name());
                     ps.addBatch();
                 }
 
@@ -101,22 +81,17 @@ public class MateriaDAO {
     }
 
     public List<Materia<ICursable>> listar() throws SQLException {
-        String sql = "SELECT * FROM materias ORDER BY nombre";
+        String sql = "SELECT id, nombre, tipo_materia FROM materias ORDER BY nombre";
         List<Materia<ICursable>> materias = new ArrayList<>();
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                String nombreInstitucion = rs.getString("institucion_nombre");
-                Institucion institucion = nombreInstitucion == null ? null : new Institucion(
-                        nombreInstitucion,
-                        rs.getString("institucion_domicilio")
-                );
                 materias.add(new Materia<>(
                         UUID.fromString(rs.getString("id")),
                         rs.getString("nombre"),
-                        institucion
+                        ETipoMateria.valueOf(rs.getString("tipo_materia"))
                 ));
             }
         }

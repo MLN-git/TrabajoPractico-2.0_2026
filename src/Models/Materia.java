@@ -48,6 +48,14 @@ public class Materia <T extends ICursable>{
         return nombre;
     }
 
+    public ETipoMateria getTipoMateria() {
+        return tipoMateria;
+    }
+
+    public void setTipoMateria(ETipoMateria tipoMateria) {
+        this.tipoMateria = tipoMateria;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
