@@ -1,5 +1,6 @@
 package Models;
 
+import Enums.ETipoMateria;
 import Interfaces.ICursable;
 
 import java.util.HashSet;
@@ -10,17 +11,20 @@ public class Materia <T extends ICursable>{
     private UUID id;
     private String nombre;
     private HashSet<T> iCursables;
+    private ETipoMateria tipoMateria;
 
-    public Materia(String nombre) {
+    public Materia(String nombre,  ETipoMateria tipoMateria) {
         this.nombre = nombre;
         this.id = UUID.randomUUID();
         iCursables = new HashSet<T>();
+        this.tipoMateria = tipoMateria;
     }
 
-    public Materia(UUID id, String nombre) {
+    public Materia(UUID id, String nombre,  ETipoMateria tipoMateria) {
         this.id = id;
         this.nombre = nombre;
         this.iCursables = new HashSet<>();
+        this.tipoMateria = tipoMateria;
     }
 
 
