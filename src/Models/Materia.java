@@ -9,20 +9,17 @@ import java.util.UUID;
 public class Materia <T extends ICursable>{
     private UUID id;
     private String nombre;
-    private Institucion institucion;
     private HashSet<T> iCursables;
 
-    public Materia(String nombre, Institucion institucion) {
+    public Materia(String nombre) {
         this.nombre = nombre;
-        this.institucion = institucion;
         this.id = UUID.randomUUID();
         iCursables = new HashSet<T>();
     }
 
-    public Materia(UUID id, String nombre, Institucion institucion) {
+    public Materia(UUID id, String nombre) {
         this.id = id;
         this.nombre = nombre;
-        this.institucion = institucion;
         this.iCursables = new HashSet<>();
     }
 
@@ -49,14 +46,6 @@ public class Materia <T extends ICursable>{
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public Institucion getInstitucion() {
-        return institucion;
-    }
-
-    public void setInstitucion(Institucion institucion) {
-        this.institucion = institucion;
     }
 
     public HashSet<T> getICursables() {

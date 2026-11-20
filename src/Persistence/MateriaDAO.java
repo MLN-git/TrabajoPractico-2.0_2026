@@ -1,7 +1,6 @@
 package Persistence;
 
 import Interfaces.ICursable;
-import Models.Institucion;
 import Models.Materia;
 
 import java.sql.*;
