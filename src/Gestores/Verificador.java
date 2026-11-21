@@ -112,11 +112,11 @@ public class Verificador {
             System.out.println(msg);
             nombre = scanner.nextLine().trim();
 
-            if (!nombre.isEmpty() && nombre.matches("[a-zA-Záéíóú ]+")) {
+            if (!nombre.isEmpty() && nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ]+")) {
                 //Por si ponen con acentos
                 return nombre;
             } else {
-                System.out.println("El nombre solo debe contener letras y espacios.");
+                System.out.println("El nombre solo debe contener letras.");
             }
 
         } while (true);

@@ -104,7 +104,7 @@ public class MateriaDAO {
             return null;
         }
 
-        if (materia.getTipoMateria() == ETipoMateria.INDIVIDUAL) {
+        if (materia.getTipoMateria() == ETipoMateria.PARTICULAR) {
             materia.getICursables().addAll(new ClaseIndividualDAO().listarPorMateria(id));
         } else if (materia.getTipoMateria() == ETipoMateria.COMISIONADA) {
             materia.getICursables().addAll(new ComisionDAO().listarPorMateria(id));

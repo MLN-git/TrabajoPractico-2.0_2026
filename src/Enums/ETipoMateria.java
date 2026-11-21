@@ -1,6 +1,6 @@
 package Enums;
 
 public enum ETipoMateria {
-    INDIVIDUAL,
+    PARTICULAR,
     COMISIONADA;
 }
