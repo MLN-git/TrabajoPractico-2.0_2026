@@ -15,13 +15,13 @@ public class Comision implements ICursable {
     private String nombreComision;
     private HashSet<Alumno> alumnos;
     private HashMap<LocalDate, HashSet<Alumno>> asistencias;
-    private Year anio;
+    private Integer anio;
 
-    public Comision(String nombreComision, Year anio) {
+    public Comision(String nombreComision, Integer anio) {
         this(UUID.randomUUID(), nombreComision, anio);
     }
 
-    public Comision(UUID id, String nombreComision, Year anio) {
+    public Comision(UUID id, String nombreComision, Integer anio) {
         this.id = id;
         this.nombreComision = nombreComision;
         this.alumnos = new HashSet<>();
@@ -130,11 +130,11 @@ public class Comision implements ICursable {
         this.alumnos = alumnos;
     }
 
-    public Year getAnio() {
+    public Integer getAnio() {
         return anio;
     }
 
-    public void setAnio(Year anio) {
+    public void setAnio(Integer anio) {
         this.anio = anio;
     }
 }

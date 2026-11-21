@@ -27,6 +27,13 @@ public class Materia <T extends ICursable>{
         this.tipoMateria = tipoMateria;
     }
 
+    public Boolean agregarCursable(T curso){
+        return iCursables.add(curso);
+    }
+
+    public Boolean eliminarCursable(T curso){
+        return iCursables.remove(curso);
+    }
 
     @Override
     public boolean equals(Object o) {

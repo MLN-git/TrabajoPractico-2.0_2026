@@ -1,6 +1,7 @@
 package menu;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -177,4 +178,14 @@ public class Verificador {
         return LocalDate.now();
     }
 
+    public static int queAnioEs(){
+        return LocalDate.now().getYear();
+    }
+
+    public static int pedirDiaSegunMes(int mes){
+        int maxDia = YearMonth.of(queAnioEs(), mes).lengthOfMonth();
+
+        System.out.println("Ingrese el dia del mes: ");
+        return Verificador.leerNumeroPositivoMinMax(1, maxDia);
+    }
 }

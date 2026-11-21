@@ -3,14 +3,21 @@ package Gestores;
 import Enums.ETipoMateria;
 import Exceptions.ElementoRepetidoException;
 import Models.Alumno;
+import Models.ClaseIndividual;
+import Models.Comision;
 import Models.Materia;
 
+import java.lang.reflect.Array;
+import java.util.Date;
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Scanner;
 
-import static menu.Verificador.leerBoolean;
-import static menu.Verificador.queDiaEs;
+import static menu.Verificador.*;
 
 public class Menu {
     private Gestora sesion;
@@ -63,6 +70,7 @@ public class Menu {
             case 1:
                 crearMateria();
             case 2:
+                editarMateria(listarMaterias());
             case 3:
             case 4:
             case 5:
@@ -105,9 +113,9 @@ public class Menu {
         }
     }
 
-    public void editarMateria(){
+    public Materia<?> listarMaterias(){
         // Listar materias creadas en la gestora
-        LinkedHashSet<Materia<?>> materias = sesion.getMateriasExistentes();
+        ArrayList<Materia<?>> materias = new ArrayList<>(sesion.getMateriasExistentes());
 
         int numero = 1;
         System.out.println("Seleccione una materia: \n");
@@ -115,8 +123,72 @@ public class Menu {
         for (Materia<?> materia : materias){
             System.out.println(numero++ + " - " + materia.getNombre());
         }
+        int opcion = menu.Verificador.leerNumeroPositivoMinMax(1, materias.size());
+
+        return materias.get(opcion - 1);
+    }
+
+    public void editarMateria(Materia<?> materia){
+        System.out.println("---EDITAR MATERIA---\n\n");
+        System.out.println("1 - Crear Cursable");
+        System.out.println("2 - Borrar Cursable");
+        System.out.println("3 - Cambiar Nombre");
+        System.out.println("4 - Editar Cursable");
+        System.out.println("5 - Atrás");
+        int opcion = menu.Verificador.leerNumeroPositivoMinMax(1,5);
+        // TENER EN CUENTA EL ETIPOMATERIA EN CADA OPCION
+
+        switch (opcion){
+            case 1:
+                switch (materia.getTipoMateria()){
+                    case PARTICULAR:
+                        @SuppressWarnings("unchecked")
+                        Materia<ClaseIndividual> particular =
+                                (Materia<ClaseIndividual>) materia;
+                        particular.agregarCursable(crearClaseParticular());
+                        break;
+                    case COMISIONADA:
+                        @SuppressWarnings("unchecked")
+                        Materia<Comision> comisiona = (Materia<Comision>) materia;
+                        comisiona.agregarCursable(crearComision());
+                        break;
+                }
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                break;
+        }
 
     }
+
+    public Comision crearComision(){
+
+        String nombre = menu.Verificador.leerNombre("Ingrese el nombre de la comision: ");
+        int anio = menu.Verificador.leerNumeroPositivoMinMax(2026,2050);
+
+        return new Comision(nombre, anio);
+
+    }
+
+    public ClaseIndividual crearClaseParticular(){
+        System.out.println("¿A que hora se cursa esta clase? (solo hora en punto de 1 a 24)");
+        System.out.println("Ten en cuenta que la hora no se puede cambiar");
+        int hora = menu.Verificador.leerNumeroPositivoMinMax(1,24);
+
+        System.out.println("Ingrese el mes(1/12): ");
+        int mes = menu.Verificador.leerNumeroPositivoMinMax(1,12);
+        int dia = menu.Verificador.pedirDiaSegunMes(mes);
+
+        String nombre = menu.Verificador.leerNombre("Ingrese el nombre del materia: ");
+
+        LocalDateTime fechayHora = LocalDateTime.of(queAnioEs(),mes, dia, hora, 0);
+        Date fecha = Date.from(fechayHora.atZone(ZoneId.systemDefault()).toInstant());
+        return new ClaseIndividual(fecha, nombre);
+
+    }
+
+
 
     public void crearAlumno(){
         Alumno alumno = new Alumno(
