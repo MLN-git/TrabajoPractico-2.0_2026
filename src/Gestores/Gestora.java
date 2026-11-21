@@ -6,20 +6,21 @@ import Models.Usuario;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.UUID;
 
 public class Gestora {
     HashMap<UUID, Usuario> usuarios;
     HashMap<UUID, Alumno> alumnosExistentes;
-    HashSet<Materia> materiasExistentes;
+    LinkedHashSet<Materia> materiasExistentes;
 
     public Gestora() {
         this.usuarios = new HashMap<>();
         this.alumnosExistentes = new HashMap<>();
-        this.materiasExistentes = new HashSet<>();
+        this.materiasExistentes = new LinkedHashSet<>();
     }
 
-    private String listarNombresUsuarios() {
+    public String listarNombresUsuarios() {
         StringBuilder nombres = new StringBuilder();
         for (Usuario usuario : usuarios.values()) {
             nombres.append(usuario.getNombre()).append("\n");
@@ -27,7 +28,7 @@ public class Gestora {
         return nombres.toString();
     }
 
-    private String listarAlumnos() {
+    public String listarAlumnos() {
         StringBuilder alumnos = new StringBuilder();
         for (Alumno alumno : alumnosExistentes.values()) {
             alumnos.append("Nombre: ").append(alumno.getNombre()).append(". Apellido: ").append(alumno.getApellido()).append("\n");
@@ -35,7 +36,7 @@ public class Gestora {
         return alumnos.toString();
     }
 
-    private String listarMaterias() {
+    public String listarMaterias() {
         StringBuilder materias = new StringBuilder();
         for (Materia materia : materiasExistentes) {
             materias.append("Nombre: ").append(materia.getNombre()).append("\n");
@@ -43,7 +44,9 @@ public class Gestora {
         return materias.toString();
     }
 
-    private boolean agregarUsuario(Usuario usuario) {
+
+
+    public boolean agregarUsuario(Usuario usuario) {
         if (usuarios.containsKey(usuario.getId())) {
             return false;
         }
@@ -51,7 +54,7 @@ public class Gestora {
         return true;
     }
 
-    private boolean agregarAlumno(Alumno alumno) {
+    public boolean agregarAlumno(Alumno alumno) {
         if (alumnosExistentes.containsKey(alumno.getId())) {
             return false;
         }
@@ -59,7 +62,7 @@ public class Gestora {
         return true;
     }
 
-    private boolean agregarMateria(Materia materia) {
+    public boolean agregarMateria(Materia materia) {
         if (materiasExistentes.contains(materia)) {
             return false;
         }
@@ -67,7 +70,7 @@ public class Gestora {
         return true;
     }
 
-    private boolean darBajaUsuario(UUID id) {
+    public boolean darBajaUsuario(UUID id) {
         if (!usuarios.containsKey(id)) {
             return false;
         }
@@ -75,7 +78,7 @@ public class Gestora {
         return true;
     }
 
-    private boolean darBajaAlumno(UUID id) {
+    public boolean darBajaAlumno(UUID id) {
         if (!alumnosExistentes.containsKey(id)) {
             return false;
         }
@@ -83,7 +86,7 @@ public class Gestora {
         return true;
     }
 
-    private boolean darBajaMateria(Materia materia) {
+    public boolean darBajaMateria(Materia materia) {
         if (!materiasExistentes.contains(materia)) {
             return false;
         }
