@@ -44,7 +44,9 @@ public class Gestora {
         return materias.toString();
     }
 
-
+    public LinkedHashSet<Materia<?>> getMateriasExistentes() {
+        return new LinkedHashSet<>(materiasExistentes);
+    }
 
     public boolean agregarUsuario(Usuario usuario) {
         if (usuarios.containsKey(usuario.getId())) {
@@ -62,12 +64,8 @@ public class Gestora {
         return true;
     }
 
-    public boolean agregarMateria(Materia materia) {
-        if (materiasExistentes.contains(materia)) {
-            return false;
-        }
-        materiasExistentes.add(materia);
-        return true;
+    public boolean agregarMateria(Materia<?> materia) {
+        return materiasExistentes.add(materia);
     }
 
     public boolean darBajaUsuario(UUID id) {
@@ -86,11 +84,7 @@ public class Gestora {
         return true;
     }
 
-    public boolean darBajaMateria(Materia materia) {
-        if (!materiasExistentes.contains(materia)) {
-            return false;
-        }
-        materiasExistentes.remove(materia);
-        return true;
+    public boolean darBajaMateria(Materia<?> materia) {
+        return  materiasExistentes.remove(materia);
     }
 }
