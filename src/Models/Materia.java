@@ -31,7 +31,7 @@ public class Materia <T extends ICursable>{
         return iCursables.add(curso);
     }
 
-    public Boolean eliminarCursable(T curso){
+    public Boolean eliminarCursable(ICursable curso){
         return iCursables.remove(curso);
     }
 

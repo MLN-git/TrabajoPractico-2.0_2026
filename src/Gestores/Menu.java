@@ -1,7 +1,10 @@
 package Gestores;
 
 import Enums.ETipoMateria;
+import Exceptions.AlumnosVacioException;
 import Exceptions.ElementoRepetidoException;
+import Exceptions.NoSeEncontroElElementoException;
+import Interfaces.ICursable;
 import Models.Alumno;
 import Models.ClaseIndividual;
 import Models.Comision;
@@ -72,7 +75,9 @@ public class Menu {
             case 2:
                 editarMateria(listarMaterias());
             case 3:
+                eliminarMateria(listarMaterias());
             case 4:
+                asistencia(listarMaterias());
             case 5:
                 break;
         }
@@ -128,6 +133,40 @@ public class Menu {
         return materias.get(opcion - 1);
     }
 
+    public ICursable listarCursables(Materia<?> materia){
+        ArrayList<ICursable> cursables = new ArrayList<>(materia.getICursables());
+
+        int numero = 1;
+        System.out.println("Seleccione una cursable: \n");
+
+        for (ICursable curso : cursables){
+            System.out.println(numero++ + " - " + materia.getNombre());
+        }
+        int opcion = menu.Verificador.leerNumeroPositivoMinMax(1, cursables.size());
+
+        return  cursables.get(opcion - 1);
+    }
+
+    public void eliminarMateria(Materia<?> materia){
+        try{
+            sesion.darBajaMateria(materia);
+        }catch (NoSeEncontroElElementoException e){
+            System.out.println(e.getMessage());
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void asistencia(Materia<?> materia){
+        ICursable cursable = listarCursables(materia);
+
+        try {
+            cursable.tomarAsistencia();
+        } catch (AlumnosVacioException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void editarMateria(Materia<?> materia){
         System.out.println("---EDITAR MATERIA---\n\n");
         System.out.println("1 - Crear Cursable");
@@ -154,6 +193,7 @@ public class Menu {
                         break;
                 }
             case 2:
+
             case 3:
             case 4:
             case 5:

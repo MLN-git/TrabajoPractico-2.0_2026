@@ -1,5 +1,6 @@
 package Gestores;
 
+import Exceptions.NoSeEncontroElElementoException;
 import Models.Alumno;
 import Models.Materia;
 import Models.Usuario;
@@ -84,7 +85,9 @@ public class Gestora {
         return true;
     }
 
-    public boolean darBajaMateria(Materia<?> materia) {
-        return  materiasExistentes.remove(materia);
+    public void darBajaMateria(Materia<?> materia) throws NoSeEncontroElElementoException {
+        if (!(materiasExistentes.remove(materia))){
+            throw new NoSeEncontroElElementoException("La materia no está en la cuenta");
+        };
     }
 }
