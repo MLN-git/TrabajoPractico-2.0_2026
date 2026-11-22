@@ -44,7 +44,7 @@ public class MateriaDAO {
                     return new Materia<>(
                             UUID.fromString(rs.getString("id")),
                             rs.getString("nombre"),
-                            ETipoMateria.valueOf(rs.getString("tipo_materia"))
+                            leerTipoMateria(rs.getString("tipo_materia"))
                     );
                 }
                 return null;
@@ -91,7 +91,7 @@ public class MateriaDAO {
                 materias.add(new Materia<>(
                         UUID.fromString(rs.getString("id")),
                         rs.getString("nombre"),
-                        ETipoMateria.valueOf(rs.getString("tipo_materia"))
+                        leerTipoMateria(rs.getString("tipo_materia"))
                 ));
             }
         }
@@ -118,5 +118,12 @@ public class MateriaDAO {
             materiasCompletas.add(obtenerCompletaPorId(materia.getId()));
         }
         return materiasCompletas;
+    }
+
+    private ETipoMateria leerTipoMateria(String tipo) {
+        if ("INDIVIDUAL".equals(tipo)) {
+            return ETipoMateria.PARTICULAR;
+        }
+        return ETipoMateria.valueOf(tipo);
     }
 }

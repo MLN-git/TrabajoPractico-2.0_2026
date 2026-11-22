@@ -5,7 +5,6 @@ import Models.Comision;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,7 +33,7 @@ public class ComisionDAO {
                 psCursable.executeUpdate();
 
                 psComision.setString(1, comision.getId().toString());
-                psComision.setInt(2, comision.getAnio().getValue());
+                psComision.setInt(2, comision.getAnio());
                 psComision.executeUpdate();
                 conexion.commit();
             } catch (SQLException e) {
@@ -67,20 +66,20 @@ public class ComisionDAO {
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id.toString());
+            Comision comision;
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     return null;
                 }
-                Comision comision = new Comision(
+                comision = new Comision(
                         UUID.fromString(rs.getString("id")),
                         rs.getString("nombre"),
-                        Year.of(rs.getInt("anio"))
+                        rs.getInt("anio")
                 );
-                rs.close();
-                cargarAlumnos(conexion, comision);
-                cargarAsistencias(conexion, comision);
-                return comision;
             }
+            cargarAlumnos(conexion, comision);
+            cargarAsistencias(conexion, comision);
+            return comision;
         }
     }
 

@@ -68,21 +68,21 @@ public class ClaseIndividualDAO {
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id.toString());
+            ClaseIndividual clase;
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     return null;
                 }
 
-                ClaseIndividual clase = new ClaseIndividual(
+                clase = new ClaseIndividual(
                         UUID.fromString(rs.getString("id")),
                         rs.getTimestamp("fecha_y_hora"),
                         rs.getString("nombre")
                 );
-                rs.close();
-                cargarAlumnos(conexion, clase);
-                cargarAsistencia(conexion, clase);
-                return clase;
             }
+            cargarAlumnos(conexion, clase);
+            cargarAsistencia(conexion, clase);
+            return clase;
         }
     }
 
