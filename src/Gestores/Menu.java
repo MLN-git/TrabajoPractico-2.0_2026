@@ -57,7 +57,6 @@ public class Menu {
 
     // Terminado
     public void menuMaterias(){
-        // Agregar opciones del menu materias
         System.out.println("---MATERIAS---\n\n");
         System.out.println("1 - Crear Materia\n");
         System.out.println("2 - Editar Materia\n");
@@ -71,11 +70,23 @@ public class Menu {
             case 1:
                 crearMateria();
             case 2:
-                menuEditarMateria(extraerElegibles(sesion));
+                try {
+                    menuEditarMateria(extraerElegibles(sesion));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
             case 3:
-                eliminarMateria(extraerElegibles(sesion));
+                try {
+                    eliminarMateria(extraerElegibles(sesion));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
             case 4:
-                menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
+                try {
+                    menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
             case 5:
                 break;
         }
@@ -137,23 +148,21 @@ public class Menu {
                 }
             case 2:
                 try {
-                    cursable.listarAsistencias();
+                    System.out.println(cursable.listarAsistencias());
                 } catch (AlumnosVacioException e) {
                     throw new RuntimeException(e);
                 }
             case 3:
                 try {
-                    cursable.agregarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
+                    cursable.agregarPresente(elegirOpcion(cursable.getElegibles()));
                 } catch (NoSeEncontroElElementoException e) {
+                    System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
                 }
             case 4:
                 try {
-                    cursable.eliminarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
+                    cursable.eliminarPresente(elegirOpcion(cursable.getElegibles()));
                 } catch (NoSeEncontroElElementoException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
@@ -173,7 +182,6 @@ public class Menu {
         System.out.println("4 - Editar Cursable");
         System.out.println("5 - Atrás");
         int opcion = leerNumeroPositivoMinMax(1,5);
-        // TENER EN CUENTA EL ETIPOMATERIA EN CADA OPCION
 
         switch (opcion){
             case 1:
@@ -198,11 +206,17 @@ public class Menu {
                     materia.eliminarCursable(extraerElegibles(materia));
                 }catch (NoSeEncontroElElementoException e){
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
                 }
             case 3:
                 materia.setNombre(leerNombre("Escriba el nuevo nombre"));
             case 4:
-                menuCursable(extraerElegibles(materia));
+                try {
+                    menuCursable(extraerElegibles(materia));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
             case 5:
                 break;
         }
@@ -249,18 +263,14 @@ public class Menu {
     // ahora acabo de dividir la funcion elegirOpcion para que no tenga que
     // si o si pedir un IElegible y que pida un arraylist así puedo usar
     // el getAlumnosElegibles así como hago en el menuCursable
-    public <T extends ITieneNombre> T extraerElegibles(IElegible<T> elegible){
-        ArrayList<T> lista = null;
-        try {
-            lista = elegible.getElegibles();
-        } catch (SinElementosException e) {
-            System.out.println(e.getMessage());
-        }
+    public <T extends ITieneNombre> T extraerElegibles(IElegible<T> elegible) throws SinElementosException {
 
-        return elegirOpcion(lista);
+            ArrayList<T> lista;
+            lista = elegible.getElegibles();
+            return elegirOpcion(lista);
     }
 
-    // Hacer elegibles:
+    // Hice elegibles:
     // Gestora<Materia>, materia<ICursable>, ICursable<Alumno>
     public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista){
         // Esta es la version generica
