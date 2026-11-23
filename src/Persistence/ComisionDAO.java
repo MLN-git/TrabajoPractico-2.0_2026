@@ -167,7 +167,9 @@ public class ComisionDAO {
                     ps.setString(1, comision.getId().toString());
                     ps.setDate(2, Date.valueOf(fecha));
                     try (ResultSet rs = ps.executeQuery()) {
-                        rs.next();
+                        if (!rs.next()) {
+                            throw new SQLException("No se encontró la sesión de asistencia creada");
+                        }
                         sesionId = rs.getString("id");
                     }
                 }
@@ -178,7 +180,7 @@ public class ComisionDAO {
                 }
 
                 try (PreparedStatement ps = conexion.prepareStatement(insertarDetalle)) {
-                    for (Alumno alumno : comision.getAlumnos()) {
+                    for (Alumno alumno : comision.getElegibles()) {
                         ps.setString(1, sesionId);
                         ps.setString(2, alumno.getId().toString());
                         ps.setBoolean(3, presentes.contains(alumno));
