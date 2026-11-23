@@ -181,21 +181,35 @@ public class Menu {
             case 1:
                 switch (materia.getTipoMateria()){
                     case PARTICULAR:
-                        @SuppressWarnings("unchecked")
-                        Materia<ClaseIndividual> particular =
-                                (Materia<ClaseIndividual>) materia;
-                        particular.agregarCursable(crearClaseParticular());
-                        break;
+
+                        try {
+                            @SuppressWarnings("unchecked")
+                            Materia<ClaseIndividual> particular =
+                                    (Materia<ClaseIndividual>) materia;
+                            particular.agregarCursable(crearClaseParticular());
+                        } catch (ElementoRepetidoException e) {
+                            System.out.println(e.getMessage());
+                        }
+
                     case COMISIONADA:
-                        @SuppressWarnings("unchecked")
-                        Materia<Comision> comisiona = (Materia<Comision>) materia;
-                        comisiona.agregarCursable(crearComision());
-                        break;
+                        try {
+                            @SuppressWarnings("unchecked")
+                            Materia<Comision> comisiona = (Materia<Comision>) materia;
+                            comisiona.agregarCursable(crearComision());
+                        }catch (ElementoRepetidoException e) {
+                            System.out.println(e.getMessage());
+                        }
                 }
             case 2:
-
+                try {
+                    materia.eliminarCursable(listarCursables(materia));
+                }catch (NoSeEncontroElElementoException e){
+                    System.out.println(e.getMessage());
+                }
             case 3:
+                materia.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
             case 4:
+                menuCursable(listarCursables(materia));
             case 5:
                 break;
         }
@@ -241,11 +255,25 @@ public class Menu {
     }
 
 
+    public void menuCursable(ICursable curso){
+        System.out.println("--EDITAR CURSABLE--");
+        // TERMINAR
+        curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+
+    }
     public static Boolean consultarAlumno(Alumno alumno) {
-        return leerBoolean("¿El Alumno: "
-                                    + alumno.getNombre() + " "
-                                    + alumno.getApellido()
-                                    + "\nEstá presente? (true/false)");
+        System.out.println(("¿El Alumno: "
+                + alumno.getNombre() + " "
+                + alumno.getApellido()
+                + " Está presente?\n" +
+                "1 - Si\n" +
+                "2 - No\n"));
+        Integer opcion = menu.Verificador.leerNumeroPositivoMinMax(1,2);
+        if (opcion == 1) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }

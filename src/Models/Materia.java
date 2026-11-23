@@ -1,6 +1,8 @@
 package Models;
 
 import Enums.ETipoMateria;
+import Exceptions.ElementoRepetidoException;
+import Exceptions.NoSeEncontroElElementoException;
 import Interfaces.ICursable;
 
 import java.util.HashSet;
@@ -27,12 +29,16 @@ public class Materia <T extends ICursable>{
         this.tipoMateria = tipoMateria;
     }
 
-    public Boolean agregarCursable(T curso){
-        return iCursables.add(curso);
+    public void agregarCursable(T curso) throws ElementoRepetidoException {
+        if (!(iCursables.add(curso))){
+            throw new ElementoRepetidoException("El cursable está repetido");
+        }
     }
 
-    public Boolean eliminarCursable(ICursable curso){
-        return iCursables.remove(curso);
+    public void eliminarCursable(ICursable curso) throws NoSeEncontroElElementoException {
+        if (!(iCursables.remove(curso))){
+            throw new NoSeEncontroElElementoException("El Cursable no ha sido encontrado");
+        }
     }
 
     @Override

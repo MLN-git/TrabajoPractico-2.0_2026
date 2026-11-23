@@ -12,5 +12,5 @@ public interface ICursable {
     public String listarAsistencias() throws AlumnosVacioException;
     public Boolean agregarPresente(Alumno alumno);
     public Boolean eliminarPresente(Alumno alumno);
-
+    public void setNombre(String nombre);
 }

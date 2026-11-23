@@ -122,6 +122,10 @@ public class Comision implements ICursable {
         return nombreComision;
     }
 
+    public void setNombre(String nombre) {
+        this.nombreComision = nombre;
+    }
+
     public HashSet<Alumno> getAlumnos() {
         return alumnos;
     }
