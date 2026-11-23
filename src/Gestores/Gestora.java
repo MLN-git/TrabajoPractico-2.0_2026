@@ -5,31 +5,31 @@ import Exceptions.ElementoRepetidoException;
 import Exceptions.NoSeEncontroElElementoException;
 import Exceptions.SinElementosException;
 import Interfaces.IElegible;
-import Interfaces.ITieneNombre;
 import Models.Alumno;
 import Models.Materia;
 import Models.Usuario;
+import Persistence.AlumnoDAO;
+import Persistence.MateriaDAO;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class Gestora implements IElegible<Materia> {
-    HashMap<UUID, Usuario> usuarios;
-    HashMap<UUID, Alumno> alumnosExistentes;
-    LinkedHashSet<Materia> materiasExistentes;
+    private final Usuario usuario;
+    private final AlumnoDAO alumnoDAO = new AlumnoDAO();
+    private final MateriaDAO materiaDAO = new MateriaDAO();
+    private HashMap<UUID, Alumno> alumnosExistentes = new HashMap<>();
+    private LinkedHashSet<Materia> materiasExistentes= new LinkedHashSet<>();
 
-    public Gestora() {
-        this.usuarios = new HashMap<>();
-        this.alumnosExistentes = new HashMap<>();
-        this.materiasExistentes = new LinkedHashSet<>();
-    }
-
-    public String listarNombresUsuarios() {
-        StringBuilder nombres = new StringBuilder();
-        for (Usuario usuario : usuarios.values()) {
-            nombres.append(usuario.getNombre()).append("\n");
+    public Gestora(Usuario usuario) throws SQLException {
+        this.usuario = usuario;
+        for (Alumno a : alumnoDAO.listar(usuario.getId())) {
+            alumnosExistentes.put(a.getId(), a);
         }
-        return nombres.toString();
+        materiasExistentes.addAll(materiaDAO.listarCompletas(usuario.getId()));
     }
+
+
 
     public String listarAlumnos() {
         StringBuilder alumnos = new StringBuilder();
@@ -63,18 +63,11 @@ public class Gestora implements IElegible<Materia> {
         return new ArrayList<>(alumnosExistentes.values());
     }
 
-    public boolean agregarUsuario(Usuario usuario) {
-        if (usuarios.containsKey(usuario.getId())) {
-            return false;
-        }
-        usuarios.put(usuario.getId(), usuario);
-        return true;
-    }
-
-    public void agregarAlumno(Alumno alumno) throws ElementoRepetidoException {
+    public void agregarAlumno(Alumno alumno) throws ElementoRepetidoException, SQLException {
         if (alumnosExistentes.containsKey(alumno.getId())) {
             throw new ElementoRepetidoException("El id del Alumno ya existe");
         }
+        alumnoDAO.guardarAlumno(alumno, usuario.getId());
         alumnosExistentes.put(alumno.getId(), alumno);
     }
 
@@ -82,27 +75,23 @@ public class Gestora implements IElegible<Materia> {
         if (!(materiasExistentes.add(materia))){
             throw new ElementoRepetidoException("El id de la materia ya está en la cuenta");
         }
+        materiaDAO.guardarMateria(materia, usuario.getId());
     }
 
-    public boolean darBajaUsuario(UUID id) {
-        if (!usuarios.containsKey(id)) {
-            return false;
-        }
-        usuarios.remove(id);
-        return true;
-    }
+//  Ningun alumno deberia ser eliminado, simplemente quedan en la db y se levantan segun el usuario pero no se eliminan
+//    public boolean darBajaAlumno(UUID id) {
+//        if (!alumnosExistentes.containsKey(id)) {
+//            return false;
+//        }
+//        alumnosExistentes.remove(id);
+//        return true;
+//    }
 
-    public boolean darBajaAlumno(UUID id) {
-        if (!alumnosExistentes.containsKey(id)) {
-            return false;
-        }
-        alumnosExistentes.remove(id);
-        return true;
-    }
-
-    public void darBajaMateria(Materia materia) throws NoSeEncontroElElementoException {
-        if (!(materiasExistentes.remove(materia))){
+    public void darBajaMateria(Materia materia) throws NoSeEncontroElElementoException, SQLException {
+        if (!(materiasExistentes.contains(materia))){
             throw new NoSeEncontroElElementoException("La materia no está en la cuenta");
-        };
+        }
+        materiaDAO.eliminarMateria(materia.getId(), usuario.getId());
+        materiasExistentes.remove(materia);
     }
 }
