@@ -7,10 +7,10 @@ import java.sql.Statement;
 
 public final class ConexionDB {
     private static final String BASE_DATOS = "TPFinal_2026_ManuIgna";
-    private static final String URL_SERVIDOR = "jdbc:mysql://172.16.1.64:3306/";
+    private static final String URL_SERVIDOR = "jdbc:mysql://localhost:3306/";
     private static final String URL = URL_SERVIDOR + BASE_DATOS;
-    private static final String USER = "bdd1";
-    private static final String PASSWORD = "bdd1";
+    private static final String USER = "root";
+    private static final String PASSWORD = "root";
     private static boolean inicializada;
 
     private ConexionDB() {
@@ -35,14 +35,6 @@ public final class ConexionDB {
 
         try (Connection conexion = DriverManager.getConnection(URL, USER, PASSWORD);
              Statement sentencia = conexion.createStatement()) {
-            sentencia.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS alumnos (
-                        id CHAR(36) PRIMARY KEY,
-                        nombre VARCHAR(100) NOT NULL,
-                        apellido VARCHAR(100) NOT NULL,
-                        anio_ingreso INT NULL
-                    )
-                    """);
 
             sentencia.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS usuarios (
@@ -53,10 +45,27 @@ public final class ConexionDB {
                     """);
 
             sentencia.executeUpdate("""
+                    CREATE TABLE IF NOT EXISTS alumnos (
+                                 id CHAR(36) PRIMARY KEY,
+                                 usuario_id CHAR(36) NOT NULL,
+                                 nombre VARCHAR(100) NOT NULL,
+                                 apellido VARCHAR(100) NOT NULL,
+                                 anio_ingreso INT NULL,
+                                 CONSTRAINT fk_alumnos_usuario
+                                     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+                                     ON DELETE CASCADE
+                             )
+                    """);
+
+            sentencia.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS materias (
                         id CHAR(36) PRIMARY KEY,
+                        usuario_id CHAR(36) NOT NULL,
                         nombre VARCHAR(100) NOT NULL,
-                        tipo_materia VARCHAR(30) NOT NULL
+                        tipo_materia VARCHAR(30) NOT NULL,
+                        CONSTRAINT fk_materias_usuario
+                            FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+                            ON DELETE CASCADE
                     )
                     """);
 
