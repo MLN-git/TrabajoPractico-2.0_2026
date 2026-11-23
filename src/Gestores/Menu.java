@@ -118,13 +118,21 @@ public class Menu {
                                             "Escriba el primer nombre del alumno sin espacios: "));
                 } catch (AlumnosVacioException e) {
                     throw new RuntimeException(e);
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+
                 }
                 break;
             case 3:
                 try {
-                    elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
-                            menu.Verificador.leerNombre(
-                                    "Escriba el primer apellido del alumno sin espacios: "));
+                    try {
+                        elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
+                                menu.Verificador.leerNombre(
+                                        "Escriba el primer apellido del alumno sin espacios: "));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+
+                    }
                 } catch (AlumnosVacioException e) {
                     throw new RuntimeException(e);
                 }
@@ -259,6 +267,9 @@ public class Menu {
                     System.out.println(e.getMessage());
                 } catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+
                 }
                 break;
             case 2:
@@ -267,6 +278,8 @@ public class Menu {
                 }catch (NoSeEncontroElElementoException e){
                     System.out.println(e.getMessage());
                 }catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
                 }
                 break;
@@ -293,11 +306,13 @@ public class Menu {
 
     // Hice elegibles:
     // Gestora<Materia>, materia<ICursable>, ICursable<Alumno>
-    public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista){
+    public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista) throws SinElementosException {
         // Esta es la version generica
         // EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         // Estoy escribiendo esto muy feliz porque entendí todo
-
+        if (lista.isEmpty()){
+            throw new SinElementosException("La lista está vacia");
+        }
         int numero = 1;
         System.out.println("Seleccione una opcion: \n");
 
@@ -370,9 +385,11 @@ public class Menu {
             case 1:
                 // Materia Comisionada
                 materia = new Materia(nombre, ETipoMateria.COMISIONADA);
+                break;
             case 2:
                 // Materia Particular
                 materia = new Materia(nombre, ETipoMateria.PARTICULAR);
+                break;
             default:
                 System.out.println("\nOpción no válida.");
         }
