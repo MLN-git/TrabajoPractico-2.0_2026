@@ -1,10 +1,7 @@
 package Gestores;
 
 import Enums.ETipoMateria;
-import Exceptions.AlumnosVacioException;
-import Exceptions.AsistenciaYaTomadaException;
-import Exceptions.ElementoRepetidoException;
-import Exceptions.NoSeEncontroElElementoException;
+import Exceptions.*;
 import Interfaces.ICursable;
 import Interfaces.IElegible;
 import Interfaces.ITieneNombre;
@@ -31,6 +28,7 @@ public class Menu {
         this.sesion = sesion;
     }
 
+    // Terminado
     public void mostrarMenu(){
         do {
             System.out.println("---MENU---\n\n");
@@ -57,6 +55,7 @@ public class Menu {
         }  while (opcionMenu != 3);
     }
 
+    // Terminado
     public void menuMaterias(){
         // Agregar opciones del menu materias
         System.out.println("---MATERIAS---\n\n");
@@ -72,58 +71,201 @@ public class Menu {
             case 1:
                 crearMateria();
             case 2:
-                editarMateria(elegirOpcion(sesion));
+                menuEditarMateria(extraerElegibles(sesion));
             case 3:
-                eliminarMateria(elegirOpcion(sesion));
+                eliminarMateria(extraerElegibles(sesion));
             case 4:
-                asistencia(elegirOpcion(elegirOpcion(sesion)));
+                menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
             case 5:
                 break;
         }
     }
 
+    // Terminado
     public void menuAlumnos(){
         // Agregar opciones del menu alumnos
         System.out.println("---ALUMNOS---\n\n");
         System.out.println("1 - Crear Alumno\n");
         System.out.println("2 - Cambiar nombre\n");
         System.out.println("3 - Cambiar apellido\n");
+        System.out.println("4 - Atrás");
+
+        switch (leerNumeroPositivoMinMax(1,4)){
+            case 1:
+                crearAlumno();
+            case 2:
+                try {
+                    elegirOpcion(sesion.getAlumnosElegibles()).setNombre(
+                                    menu.Verificador.leerNombre(
+                                            "Escriba el primer nombre del alumno sin espacios: "));
+                } catch (AlumnosVacioException e) {
+                    throw new RuntimeException(e);
+                }
+            case 3:
+                try {
+                    elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
+                            menu.Verificador.leerNombre(
+                                    "Escriba el primer apellido del alumno sin espacios: "));
+                } catch (AlumnosVacioException e) {
+                    throw new RuntimeException(e);
+                }
+            case 4:
+                break;
+        }
 
 
     }
 
-    public void crearMateria(){
-        System.out.println("1 - Materia comisionada\n");
-        System.out.println("2 - Materia de Clases Particulares\n");
-        int opcion = menu.Verificador.leerNumeroPositivoMinMax(1,2);
+    // Terminado
+    public void menuAsistencia(ICursable cursable){
+        System.out.println("--MENU ASISTENCIA---\n\n");
+        System.out.println("1 - Tomar asistencia\n");
+        System.out.println("2 - Listar asistencias\n");
+        System.out.println("3 - Agregar asistencia individual\n");
+        System.out.println("4 - Eliminar asistencia individual\n");
+        System.out.println("5 - Atrás\n");
 
-        String nombre = menu.Verificador.leerNombre("Ingrese el nombre del materia: ");
-        Materia materia = null;
 
+        switch (menu.Verificador.leerNumeroPositivoMinMax(1,5)){
+            case 1:
+                try {
+                    cursable.tomarAsistencia();
+                } catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                } catch (AsistenciaYaTomadaException e){
+                    System.out.println(e.getMessage());
+                }
+            case 2:
+                try {
+                    cursable.listarAsistencias();
+                } catch (AlumnosVacioException e) {
+                    throw new RuntimeException(e);
+                }
+            case 3:
+                try {
+                    cursable.agregarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
+                } catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                } catch (NoSeEncontroElElementoException e) {
+                    System.out.println(e.getMessage());
+                }
+            case 4:
+                try {
+                    cursable.eliminarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
+                } catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                } catch (NoSeEncontroElElementoException e) {
+                    System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+            case 5:
+                break;
+        }
+    }
+
+    // Terminado
+    public void menuEditarMateria(Materia materia){
+        System.out.println("---EDITAR MATERIA---\n\n");
+        System.out.println("1 - Crear Cursable");
+        System.out.println("2 - Borrar Cursable");
+        System.out.println("3 - Cambiar Nombre");
+        System.out.println("4 - Editar Cursable");
+        System.out.println("5 - Atrás");
+        int opcion = leerNumeroPositivoMinMax(1,5);
+        // TENER EN CUENTA EL ETIPOMATERIA EN CADA OPCION
 
         switch (opcion){
             case 1:
-                // Materia Comisionada
-                materia = new Materia(nombre, ETipoMateria.COMISIONADA);
+                switch (materia.getTipoMateria()){
+                    case PARTICULAR:
+
+                        try {
+                            materia.agregarCursable(crearClaseParticular());
+                        } catch (ElementoRepetidoException e) {
+                            System.out.println(e.getMessage());
+                        }
+
+                    case COMISIONADA:
+                        try {
+                            materia.agregarCursable(crearComision());
+                        }catch (ElementoRepetidoException e) {
+                            System.out.println(e.getMessage());
+                        }
+                }
             case 2:
-                // Materia Particular
-                materia = new Materia(nombre, ETipoMateria.PARTICULAR);
-            default:
-                System.out.println("\nOpción no válida.");
+                try {
+                    materia.eliminarCursable(extraerElegibles(materia));
+                }catch (NoSeEncontroElElementoException e){
+                    System.out.println(e.getMessage());
+                }
+            case 3:
+                materia.setNombre(leerNombre("Escriba el nuevo nombre"));
+            case 4:
+                menuCursable(extraerElegibles(materia));
+            case 5:
+                break;
         }
 
-        if (!(materia == null)){
-            sesion.agregarMateria(materia);
+    }
+
+    // Terminado
+    public void menuCursable(ICursable curso) {
+        System.out.println("--EDITAR CURSABLE--");
+        System.out.println("1 - Agregar Alumno");
+        System.out.println("2 - Eliminar Alumno");
+        System.out.println("3 - Cambiar Nombre");
+        System.out.println("4 - Atrás");
+        int opcion = leerNumeroPositivoMinMax(1, 4);
+
+        switch (opcion) {
+            case 1:
+                try {
+                    // Esta línea de codigo es ARTE RENACENTISTA
+                    curso.agregarAlumno(elegirOpcion(sesion.getAlumnosElegibles()));
+                } catch (ElementoRepetidoException e) {
+                    System.out.println(e.getMessage());
+                } catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                }
+            case 2:
+                try {
+                    curso.eliminarAlumno(elegirOpcion(sesion.getAlumnosElegibles()));
+                }catch (NoSeEncontroElElementoException e){
+                    System.out.println(e.getMessage());
+                }catch (AlumnosVacioException e) {
+                    System.out.println(e.getMessage());
+                }
+            case 3:
+                curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+            case 4:
+                break;
         }
+//        curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+
+    }
+
+    // Eureka 4.0
+    // ahora acabo de dividir la funcion elegirOpcion para que no tenga que
+    // si o si pedir un IElegible y que pida un arraylist así puedo usar
+    // el getAlumnosElegibles así como hago en el menuCursable
+    public <T extends ITieneNombre> T extraerElegibles(IElegible<T> elegible){
+        ArrayList<T> lista = null;
+        try {
+            lista = elegible.getElegibles();
+        } catch (SinElementosException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return elegirOpcion(lista);
     }
 
     // Hacer elegibles:
     // Gestora<Materia>, materia<ICursable>, ICursable<Alumno>
-    public <T extends ITieneNombre> T elegirOpcion(IElegible<T> elegible){
+    public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista){
         // Esta es la version generica
         // EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         // Estoy escribiendo esto muy feliz porque entendí todo
-        ArrayList<T> lista = elegible.getElegibles();
 
         int numero = 1;
         System.out.println("Seleccione una opcion: \n");
@@ -138,7 +280,7 @@ public class Menu {
         return lista.get(opcion - 1);
     }
 
-    // Version anterior que no usaba bien la genericidad
+//     Version anterior que no usaba bien la genericidad
 
 //    public Materia<?> elegirMateria(){
 //        // Listar materias creadas en la gestora
@@ -183,6 +325,36 @@ public class Menu {
 //        return alumnos.get(opcion - 1);
 //    }
 
+
+    public void crearMateria(){
+        System.out.println("1 - Materia comisionada\n");
+        System.out.println("2 - Materia de Clases Particulares\n");
+        int opcion = menu.Verificador.leerNumeroPositivoMinMax(1,2);
+
+        String nombre = menu.Verificador.leerNombre("Ingrese el nombre del materia: ");
+        Materia materia = null;
+
+
+        switch (opcion){
+            case 1:
+                // Materia Comisionada
+                materia = new Materia(nombre, ETipoMateria.COMISIONADA);
+            case 2:
+                // Materia Particular
+                materia = new Materia(nombre, ETipoMateria.PARTICULAR);
+            default:
+                System.out.println("\nOpción no válida.");
+        }
+
+        if (!(materia == null)){
+            try {
+                sesion.agregarMateria(materia);
+            } catch (ElementoRepetidoException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     public void eliminarMateria(Materia materia){
         try{
             sesion.darBajaMateria(materia);
@@ -191,79 +363,6 @@ public class Menu {
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
-    }
-
-    public void asistencia(ICursable cursable){
-        System.out.println("--MENU ASISTENCIA---\n\n");
-        System.out.println("1 - Tomar asistencia\n");
-        System.out.println("2 - Listar asistencias\n");
-        System.out.println("3 - Agregar asistencia individual\n");
-        System.out.println("4 - Eliminar asistencia individual\n");
-        System.out.println("5 - Atrás\n");
-        //Falta terminar
-        switch (menu.Verificador.leerNumeroPositivoMinMax(1,5)){
-            case 1:
-                try {
-                    cursable.tomarAsistencia();
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                }catch (AsistenciaYaTomadaException e){
-                    System.out.println(e.getMessage());
-                }
-            case 2:
-                try {
-                    cursable.listarAsistencias();
-                } catch (AlumnosVacioException e) {
-                    throw new RuntimeException(e);
-                }
-            case 3:
-                // Me falta el listar alumnos
-                //cursable.agregarPresente(listarAlumnos());
-        }
-    }
-
-    public void editarMateria(Materia materia){
-        System.out.println("---EDITAR MATERIA---\n\n");
-        System.out.println("1 - Crear Cursable");
-        System.out.println("2 - Borrar Cursable");
-        System.out.println("3 - Cambiar Nombre");
-        System.out.println("4 - Editar Cursable");
-        System.out.println("5 - Atrás");
-        int opcion = leerNumeroPositivoMinMax(1,5);
-        // TENER EN CUENTA EL ETIPOMATERIA EN CADA OPCION
-
-        switch (opcion){
-            case 1:
-                switch (materia.getTipoMateria()){
-                    case PARTICULAR:
-
-                        try {
-                            materia.agregarCursable(crearClaseParticular());
-                        } catch (ElementoRepetidoException e) {
-                            System.out.println(e.getMessage());
-                        }
-
-                    case COMISIONADA:
-                        try {
-                            materia.agregarCursable(crearComision());
-                        }catch (ElementoRepetidoException e) {
-                            System.out.println(e.getMessage());
-                        }
-                }
-            case 2:
-                try {
-                    materia.eliminarCursable(elegirOpcion(materia));
-                }catch (NoSeEncontroElElementoException e){
-                    System.out.println(e.getMessage());
-                }
-            case 3:
-                materia.setNombre(leerNombre("Escriba el nuevo nombre"));
-            case 4:
-                menuCursable(elegirOpcion(materia));
-            case 5:
-                break;
-        }
-
     }
 
     public Comision crearComision(){
@@ -292,8 +391,6 @@ public class Menu {
 
     }
 
-
-
     public void crearAlumno(){
         Alumno alumno = new Alumno(
                 menu.Verificador.leerNombre("Escriba solo el nombre del alumno: "),
@@ -301,17 +398,13 @@ public class Menu {
                 queDiaEs().getYear()
         );
 
-        sesion.agregarAlumno(alumno);
+        try {
+            sesion.agregarAlumno(alumno);
+        } catch (ElementoRepetidoException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-
-    public void menuCursable(ICursable curso){
-        System.out.println("--EDITAR CURSABLE--");
-        System.out.println("1 - ");
-        // TERMINAR
-        curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
-
-    }
     public static Boolean consultarAlumno(Alumno alumno) {
         System.out.println(("¿El Alumno: "
                 + alumno.getNombre() + " "

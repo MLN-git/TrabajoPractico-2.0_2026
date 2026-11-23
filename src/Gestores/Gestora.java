@@ -1,7 +1,11 @@
 package Gestores;
 
+import Exceptions.AlumnosVacioException;
+import Exceptions.ElementoRepetidoException;
 import Exceptions.NoSeEncontroElElementoException;
+import Exceptions.SinElementosException;
 import Interfaces.IElegible;
+import Interfaces.ITieneNombre;
 import Models.Alumno;
 import Models.Materia;
 import Models.Usuario;
@@ -45,8 +49,18 @@ public class Gestora implements IElegible<Materia> {
 
     // Mini Eureka 3.0
     @Override
-    public ArrayList<Materia> getElegibles() {
+    public ArrayList<Materia> getElegibles() throws SinElementosException {
+        if (materiasExistentes.isEmpty()) {
+            throw new SinElementosException("Todavia no existen materias");
+        }
         return new ArrayList<>(materiasExistentes);
+    }
+
+    public ArrayList<Alumno> getAlumnosElegibles() throws AlumnosVacioException {
+        if  (alumnosExistentes.isEmpty()) {
+            throw new AlumnosVacioException("Todavia no hay alumnos");
+        }
+        return new ArrayList<>(alumnosExistentes.values());
     }
 
     public boolean agregarUsuario(Usuario usuario) {
@@ -57,16 +71,17 @@ public class Gestora implements IElegible<Materia> {
         return true;
     }
 
-    public boolean agregarAlumno(Alumno alumno) {
+    public void agregarAlumno(Alumno alumno) throws ElementoRepetidoException {
         if (alumnosExistentes.containsKey(alumno.getId())) {
-            return false;
+            throw new ElementoRepetidoException("El id del Alumno ya existe");
         }
         alumnosExistentes.put(alumno.getId(), alumno);
-        return true;
     }
 
-    public boolean agregarMateria(Materia materia) {
-        return materiasExistentes.add(materia);
+    public void agregarMateria(Materia materia) throws ElementoRepetidoException {
+        if (!(materiasExistentes.add(materia))){
+            throw new ElementoRepetidoException("El id de la materia ya está en la cuenta");
+        }
     }
 
     public boolean darBajaUsuario(UUID id) {

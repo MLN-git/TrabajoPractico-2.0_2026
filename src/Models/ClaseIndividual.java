@@ -1,11 +1,7 @@
 package Models;
 
-import Exceptions.AlumnosVacioException;
-import Exceptions.AsistenciaYaTomadaException;
-import Exceptions.NoSeEncontroElElementoException;
-import Exceptions.SinElementosException;
+import Exceptions.*;
 import Interfaces.ICursable;
-import Interfaces.IElegible;
 
 import java.util.*;
 
@@ -106,17 +102,17 @@ public class ClaseIndividual implements ICursable {
     }
 
     @Override
-    public Boolean agregarAlumno(Alumno alumno) {
-        return alumnos.add(alumno);
+    public void agregarAlumno(Alumno alumno) throws ElementoRepetidoException {
+        if (!(alumnos.add(alumno))){
+            throw new ElementoRepetidoException("El alumno ya está en la clase");
+        }
     }
 
     @Override
-    public Boolean eliminarAlumno(Alumno alumno) {
-        boolean eliminado = alumnos.remove(alumno);
-        if (eliminado) {
-            asistencia.remove(alumno);
+    public void eliminarAlumno(Alumno alumno) throws NoSeEncontroElElementoException {
+        if (!(alumnos.remove(alumno))) {
+            throw new NoSeEncontroElElementoException("El alumno no está en esta clase");
         }
-        return eliminado;
     }
 
     @Override

@@ -1,9 +1,6 @@
 package Models;
 
-import Exceptions.AlumnosVacioException;
-import Exceptions.AsistenciaYaTomadaException;
-import Exceptions.NoSeEncontroElElementoException;
-import Exceptions.SinElementosException;
+import Exceptions.*;
 import Interfaces.ICursable;
 
 import java.time.LocalDate;
@@ -97,13 +94,17 @@ public class Comision implements ICursable{
     }
 
     @Override
-    public Boolean agregarAlumno(Alumno alumno) {
-        return alumnos.add(alumno);
+    public void agregarAlumno(Alumno alumno) throws ElementoRepetidoException {
+        if (!(alumnos.add(alumno))){
+            throw new ElementoRepetidoException("El alumno ya está en la clase");
+        }
     }
 
     @Override
-    public Boolean eliminarAlumno(Alumno alumno) {
-        return alumnos.remove(alumno);
+    public void eliminarAlumno(Alumno alumno) throws NoSeEncontroElElementoException {
+        if (!(alumnos.remove(alumno))) {
+            throw new NoSeEncontroElElementoException("El alumno no está en esta clase");
+        }
     }
 
     @Override
