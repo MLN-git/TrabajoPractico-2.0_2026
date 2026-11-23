@@ -91,7 +91,8 @@ public class ClaseIndividual implements ICursable {
         if (!alumnos.contains(alumno)) {
             throw new NoSeEncontroElElementoException("Alumno no encontrado en la cursable");
         }
-         asistencia.add(alumno);
+        asistenciaTomada = true;
+        asistencia.add(alumno);
     }
 
     @Override

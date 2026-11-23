@@ -146,7 +146,7 @@ public class ClaseIndividualDAO {
         }
         LocalDate fecha = clase.getFechaYHora().toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate();
-        guardarAsistencia(clase.getId(), fecha, clase.getAlumnos(), clase.getAsistencia());
+        guardarAsistencia(clase.getId(), fecha, clase.getElegibles(), clase.getAsistencia());
     }
 
     private void guardarAsistencia(
@@ -180,7 +180,9 @@ public class ClaseIndividualDAO {
                     ps.setString(1, cursableId.toString());
                     ps.setDate(2, Date.valueOf(fecha));
                     try (ResultSet rs = ps.executeQuery()) {
-                        rs.next();
+                        if (!rs.next()) {
+                            throw new SQLException("No se encontró la sesión de asistencia creada");
+                        }
                         sesionId = rs.getString("id");
                     }
                 }
