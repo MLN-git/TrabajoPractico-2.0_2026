@@ -1,12 +1,13 @@
 package Models;
 
 import Exceptions.AlumnosVacioException;
+import Exceptions.AsistenciaYaTomadaException;
+import Exceptions.NoSeEncontroElElementoException;
+import Exceptions.SinElementosException;
 import Interfaces.ICursable;
+import Interfaces.IElegible;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static Gestores.Menu.consultarAlumno;
 
@@ -28,14 +29,16 @@ public class ClaseIndividual implements ICursable {
         this.nombre = nombre;
         this.alumnos = new HashSet<>();
         this.asistencia = new HashSet<>();
+        this.asistenciaTomada = false;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public HashSet<Alumno> getAlumnos() {
-        return alumnos;
+    @Override
+    public ArrayList<Alumno> getElegibles() {
+        return new ArrayList<Alumno>(alumnos);
     }
 
     public HashSet<Alumno> getAsistencia() {
@@ -56,17 +59,18 @@ public class ClaseIndividual implements ICursable {
     }
 
     @Override
-    public void tomarAsistencia() throws AlumnosVacioException {
+    public void tomarAsistencia() throws AlumnosVacioException, AsistenciaYaTomadaException {
         if (alumnos.isEmpty()){
             throw new AlumnosVacioException("No hay alumnos asignados a la clase");
+        } else if (asistenciaTomada) {
+            throw new AsistenciaYaTomadaException("La asistencia de esta clase ya está tomada");
         }
-        this.asistencia.clear();
         for (Alumno alumno : this.alumnos) {
             if (consultarAlumno(alumno)) {
                 this.asistencia.add(alumno);
             }
         }
-        this.asistenciaTomada = true;
+        marcarAsistenciaTomada();
     }
 
     @Override
@@ -83,20 +87,21 @@ public class ClaseIndividual implements ICursable {
     }
 
     @Override
-    public Boolean agregarPresente(Alumno alumno) {
+    public void agregarPresente(Alumno alumno) throws NoSeEncontroElElementoException {
         if (!alumnos.contains(alumno)) {
-            return false;
+            throw new NoSeEncontroElElementoException("Alumno no encontrado en la cursable");
         }
-        asistenciaTomada = true;
-        return asistencia.add(alumno);
+         asistencia.add(alumno);
     }
 
     @Override
-    public Boolean eliminarPresente(Alumno alumno) {
+    public void eliminarPresente(Alumno alumno) throws SinElementosException, NoSeEncontroElElementoException {
         if (asistencia == null) {
-            return false;
+            throw new SinElementosException("Todavia no se tomó asistencia");
+        } else if (!asistencia.contains(alumno)) {
+            throw new NoSeEncontroElElementoException("El alumno no ha asistido");
         }
-        return asistencia.remove(alumno);
+        asistencia.remove(alumno);
     }
 
     @Override
@@ -122,6 +127,7 @@ public class ClaseIndividual implements ICursable {
         }
         return sb.toString();
     }
+
 
 
     public Date getFechaYHora() {
@@ -150,4 +156,5 @@ public class ClaseIndividual implements ICursable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
 }

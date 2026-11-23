@@ -1,12 +1,14 @@
 package Models;
 
+import Interfaces.ITieneNombre;
+
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Alumno {
+public class Alumno implements ITieneNombre {
     private String nombre;
     private String apellido;
     private Integer anioIngreso;    // No obligatorio

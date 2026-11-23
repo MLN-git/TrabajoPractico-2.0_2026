@@ -1,16 +1,18 @@
 package Models;
 
 import Exceptions.AlumnosVacioException;
+import Exceptions.AsistenciaYaTomadaException;
+import Exceptions.NoSeEncontroElElementoException;
+import Exceptions.SinElementosException;
 import Interfaces.ICursable;
 
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 
 import static Gestores.Menu.consultarAlumno;
 import static menu.Verificador.queDiaEs;
 
-public class Comision implements ICursable {
+public class Comision implements ICursable{
     private UUID id;
     private String nombreComision;
     private HashSet<Alumno> alumnos;
@@ -42,7 +44,7 @@ public class Comision implements ICursable {
     }
 
     @Override
-    public void tomarAsistencia() throws AlumnosVacioException {
+    public void tomarAsistencia() throws AlumnosVacioException, AsistenciaYaTomadaException {
         if (alumnos.isEmpty()){
             throw new AlumnosVacioException("No hay alumnos asignados a la clase");
         }
@@ -56,6 +58,8 @@ public class Comision implements ICursable {
                 }
             }
             this.asistencias.put(hoy, asistenciaHoy);
+        }else{
+            throw new AsistenciaYaTomadaException("La asistencia ya ha sido tomada hoy");
         }
     }
 
@@ -74,17 +78,22 @@ public class Comision implements ICursable {
     }
 
     @Override
-    public Boolean agregarPresente(Alumno alumno) {
+    public void agregarPresente(Alumno alumno) throws NoSeEncontroElElementoException {
         if (!alumnos.contains(alumno)) {
-            return false;
+            throw new NoSeEncontroElElementoException("Alumno no encontrado en la comision");
         }
-        return asistencias.computeIfAbsent(queDiaEs(), dia -> new HashSet<>()).add(alumno);
+         asistencias.computeIfAbsent(queDiaEs(), dia -> new HashSet<>()).add(alumno);
     }
 
     @Override
-    public Boolean eliminarPresente(Alumno alumno) {
+    public void eliminarPresente(Alumno alumno) throws NoSeEncontroElElementoException, SinElementosException {
         HashSet<Alumno> asistenciaHoy = asistencias.get(queDiaEs());
-        return asistenciaHoy != null && asistenciaHoy.remove(alumno);
+        if (asistenciaHoy == null) {
+            throw new SinElementosException("Todavia no se tomó asistencia");
+        } else if (!asistenciaHoy.contains(alumno)) {
+            throw new NoSeEncontroElElementoException("El alumno no ha asistido");
+        }
+        asistenciaHoy.remove(alumno);
     }
 
     @Override
@@ -118,7 +127,7 @@ public class Comision implements ICursable {
         return Objects.hashCode(id);
     }
 
-    public String getNombreComision() {
+    public String getNombre() {
         return nombreComision;
     }
 
@@ -126,8 +135,9 @@ public class Comision implements ICursable {
         this.nombreComision = nombre;
     }
 
-    public HashSet<Alumno> getAlumnos() {
-        return alumnos;
+    @Override
+    public ArrayList<Alumno> getElegibles() {
+        return new ArrayList<Alumno>(alumnos);
     }
 
     public void setAlumnos(HashSet<Alumno> alumnos) {

@@ -1,16 +1,14 @@
 package Gestores;
 
 import Exceptions.NoSeEncontroElElementoException;
+import Interfaces.IElegible;
 import Models.Alumno;
 import Models.Materia;
 import Models.Usuario;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.UUID;
+import java.util.*;
 
-public class Gestora {
+public class Gestora implements IElegible<Materia> {
     HashMap<UUID, Usuario> usuarios;
     HashMap<UUID, Alumno> alumnosExistentes;
     LinkedHashSet<Materia> materiasExistentes;
@@ -45,8 +43,10 @@ public class Gestora {
         return materias.toString();
     }
 
-    public LinkedHashSet<Materia<?>> getMateriasExistentes() {
-        return new LinkedHashSet<>(materiasExistentes);
+    // Mini Eureka 3.0
+    @Override
+    public ArrayList<Materia> getElegibles() {
+        return new ArrayList<>(materiasExistentes);
     }
 
     public boolean agregarUsuario(Usuario usuario) {
@@ -65,7 +65,7 @@ public class Gestora {
         return true;
     }
 
-    public boolean agregarMateria(Materia<?> materia) {
+    public boolean agregarMateria(Materia materia) {
         return materiasExistentes.add(materia);
     }
 
@@ -85,7 +85,7 @@ public class Gestora {
         return true;
     }
 
-    public void darBajaMateria(Materia<?> materia) throws NoSeEncontroElElementoException {
+    public void darBajaMateria(Materia materia) throws NoSeEncontroElElementoException {
         if (!(materiasExistentes.remove(materia))){
             throw new NoSeEncontroElElementoException("La materia no está en la cuenta");
         };

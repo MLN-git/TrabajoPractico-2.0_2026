@@ -4,21 +4,24 @@ import Enums.ETipoMateria;
 import Exceptions.ElementoRepetidoException;
 import Exceptions.NoSeEncontroElElementoException;
 import Interfaces.ICursable;
+import Interfaces.IElegible;
+import Interfaces.ITieneNombre;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Materia <T extends ICursable>{
+public class Materia implements IElegible<ICursable>, ITieneNombre {
     private UUID id;
     private String nombre;
-    private HashSet<T> iCursables;
+    private HashSet<ICursable> iCursables;
     private ETipoMateria tipoMateria;
 
     public Materia(String nombre,  ETipoMateria tipoMateria) {
         this.nombre = nombre;
         this.id = UUID.randomUUID();
-        iCursables = new HashSet<T>();
+        iCursables = new HashSet<ICursable>();
         this.tipoMateria = tipoMateria;
     }
 
@@ -29,7 +32,7 @@ public class Materia <T extends ICursable>{
         this.tipoMateria = tipoMateria;
     }
 
-    public void agregarCursable(T curso) throws ElementoRepetidoException {
+    public void agregarCursable(ICursable curso) throws ElementoRepetidoException {
         if (!(iCursables.add(curso))){
             throw new ElementoRepetidoException("El cursable está repetido");
         }
@@ -43,7 +46,7 @@ public class Materia <T extends ICursable>{
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Materia<?> materia)) return false;
+        if (!(o instanceof Materia materia)) return false;
         return Objects.equals(id, materia.id);
     }
 
@@ -73,11 +76,16 @@ public class Materia <T extends ICursable>{
         this.nombre = nombre;
     }
 
-    public HashSet<T> getICursables() {
+    public HashSet<ICursable> getICursables() {
         return iCursables;
     }
 
-    public void setICursables(HashSet<T> aulas) {
+    @Override
+    public ArrayList<ICursable> getElegibles() {
+        return new ArrayList<ICursable>(iCursables);
+    }
+
+    public void setICursables(HashSet<ICursable> aulas) {
         iCursables = aulas;
     }
 }
