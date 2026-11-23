@@ -41,9 +41,11 @@ public class Menu {
                 case 1:
                     // Ingresar a materias
                     menuMaterias();
+                    break;
                 case 2:
                     // Ingresar a Alumnos
                     menuAlumnos();
+                    break;
                 case 3:
                     System.out.println("\nSaliendo...");
                     scanner.close();
@@ -57,7 +59,6 @@ public class Menu {
 
     // Terminado
     public void menuMaterias(){
-        // Agregar opciones del menu materias
         System.out.println("---MATERIAS---\n\n");
         System.out.println("1 - Crear Materia\n");
         System.out.println("2 - Editar Materia\n");
@@ -70,12 +71,28 @@ public class Menu {
         switch (opcion){
             case 1:
                 crearMateria();
+                break;
             case 2:
-                menuEditarMateria(extraerElegibles(sesion));
+                try {
+                    menuEditarMateria(extraerElegibles(sesion));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
             case 3:
-                eliminarMateria(extraerElegibles(sesion));
+                try {
+                    eliminarMateria(extraerElegibles(sesion));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
             case 4:
-                menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
+                try {
+                    menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
             case 5:
                 break;
         }
@@ -93,6 +110,7 @@ public class Menu {
         switch (leerNumeroPositivoMinMax(1,4)){
             case 1:
                 crearAlumno();
+                break;
             case 2:
                 try {
                     elegirOpcion(sesion.getAlumnosElegibles()).setNombre(
@@ -100,15 +118,25 @@ public class Menu {
                                             "Escriba el primer nombre del alumno sin espacios: "));
                 } catch (AlumnosVacioException e) {
                     throw new RuntimeException(e);
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+
                 }
+                break;
             case 3:
                 try {
-                    elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
-                            menu.Verificador.leerNombre(
-                                    "Escriba el primer apellido del alumno sin espacios: "));
+                    try {
+                        elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
+                                menu.Verificador.leerNombre(
+                                        "Escriba el primer apellido del alumno sin espacios: "));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+
+                    }
                 } catch (AlumnosVacioException e) {
                     throw new RuntimeException(e);
                 }
+                break;
             case 4:
                 break;
         }
@@ -135,30 +163,32 @@ public class Menu {
                 } catch (AsistenciaYaTomadaException e){
                     System.out.println(e.getMessage());
                 }
+                break;
             case 2:
                 try {
-                    cursable.listarAsistencias();
+                    System.out.println(cursable.listarAsistencias());
                 } catch (AlumnosVacioException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e.getMessage());
                 }
+                break;
             case 3:
                 try {
-                    cursable.agregarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (NoSeEncontroElElementoException e) {
-                    System.out.println(e.getMessage());
-                }
-            case 4:
-                try {
-                    cursable.eliminarPresente(elegirOpcion(sesion.getAlumnosElegibles()));
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
+                    cursable.agregarPresente(elegirOpcion(cursable.getElegibles()));
                 } catch (NoSeEncontroElElementoException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
                 }
+                break;
+            case 4:
+                try {
+                    cursable.eliminarPresente(elegirOpcion(cursable.getElegibles()));
+                } catch (NoSeEncontroElElementoException e) {
+                    System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
             case 5:
                 break;
         }
@@ -173,7 +203,6 @@ public class Menu {
         System.out.println("4 - Editar Cursable");
         System.out.println("5 - Atrás");
         int opcion = leerNumeroPositivoMinMax(1,5);
-        // TENER EN CUENTA EL ETIPOMATERIA EN CADA OPCION
 
         switch (opcion){
             case 1:
@@ -185,6 +214,7 @@ public class Menu {
                         } catch (ElementoRepetidoException e) {
                             System.out.println(e.getMessage());
                         }
+                        break;
 
                     case COMISIONADA:
                         try {
@@ -193,16 +223,26 @@ public class Menu {
                             System.out.println(e.getMessage());
                         }
                 }
+                break;
             case 2:
                 try {
                     materia.eliminarCursable(extraerElegibles(materia));
                 }catch (NoSeEncontroElElementoException e){
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
                 }
+                break;
             case 3:
                 materia.setNombre(leerNombre("Escriba el nuevo nombre"));
+                break;
             case 4:
-                menuCursable(extraerElegibles(materia));
+                try {
+                    menuCursable(extraerElegibles(materia));
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
             case 5:
                 break;
         }
@@ -227,7 +267,11 @@ public class Menu {
                     System.out.println(e.getMessage());
                 } catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+
                 }
+                break;
             case 2:
                 try {
                     curso.eliminarAlumno(elegirOpcion(sesion.getAlumnosElegibles()));
@@ -235,9 +279,13 @@ public class Menu {
                     System.out.println(e.getMessage());
                 }catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
                 }
+                break;
             case 3:
                 curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+                break;
             case 4:
                 break;
         }
@@ -249,24 +297,22 @@ public class Menu {
     // ahora acabo de dividir la funcion elegirOpcion para que no tenga que
     // si o si pedir un IElegible y que pida un arraylist así puedo usar
     // el getAlumnosElegibles así como hago en el menuCursable
-    public <T extends ITieneNombre> T extraerElegibles(IElegible<T> elegible){
-        ArrayList<T> lista = null;
-        try {
-            lista = elegible.getElegibles();
-        } catch (SinElementosException e) {
-            System.out.println(e.getMessage());
-        }
+    public <T extends ITieneNombre> T extraerElegibles(IElegible<T> elegible) throws SinElementosException {
 
-        return elegirOpcion(lista);
+            ArrayList<T> lista;
+            lista = elegible.getElegibles();
+            return elegirOpcion(lista);
     }
 
-    // Hacer elegibles:
+    // Hice elegibles:
     // Gestora<Materia>, materia<ICursable>, ICursable<Alumno>
-    public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista){
+    public <T extends ITieneNombre> T elegirOpcion(ArrayList<T> lista) throws SinElementosException {
         // Esta es la version generica
         // EUREKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         // Estoy escribiendo esto muy feliz porque entendí todo
-
+        if (lista.isEmpty()){
+            throw new SinElementosException("La lista está vacia");
+        }
         int numero = 1;
         System.out.println("Seleccione una opcion: \n");
 
@@ -339,9 +385,11 @@ public class Menu {
             case 1:
                 // Materia Comisionada
                 materia = new Materia(nombre, ETipoMateria.COMISIONADA);
+                break;
             case 2:
                 // Materia Particular
                 materia = new Materia(nombre, ETipoMateria.PARTICULAR);
+                break;
             default:
                 System.out.println("\nOpción no válida.");
         }
@@ -375,9 +423,9 @@ public class Menu {
     }
 
     public ClaseIndividual crearClaseParticular(){
-        System.out.println("¿A que hora se cursa esta clase? (solo hora en punto de 1 a 24)");
+        System.out.println("¿A que hora se cursa esta clase? (solo hora en punto de 1 a 23)");
         System.out.println("Ten en cuenta que la hora no se puede cambiar");
-        int hora = menu.Verificador.leerNumeroPositivoMinMax(1,24);
+        int hora = menu.Verificador.leerNumeroPositivoMinMax(1,23);
 
         System.out.println("Ingrese el mes(1/12): ");
         int mes = menu.Verificador.leerNumeroPositivoMinMax(1,12);
