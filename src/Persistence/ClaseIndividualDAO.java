@@ -2,6 +2,7 @@ package Persistence;
 
 import Models.Alumno;
 import Models.ClaseIndividual;
+import Exceptions.ElementoRepetidoException;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -223,12 +224,20 @@ public class ClaseIndividualDAO {
             ps.setString(1, clase.getId().toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    clase.agregarAlumno(new Alumno(
-                            UUID.fromString(rs.getString("id")),
-                            rs.getString("nombre"),
-                            rs.getString("apellido"),
-                            rs.getObject("anio_ingreso", Integer.class)
-                    ));
+                    try {
+                        clase.agregarAlumno(new Alumno(
+                                UUID.fromString(rs.getString("id")),
+                                rs.getString("nombre"),
+                                rs.getString("apellido"),
+                                rs.getObject("anio_ingreso", Integer.class)
+                        ));
+                    } catch (ElementoRepetidoException e) {
+                        throw new SQLException(
+                                "La base contiene un alumno duplicado para la clase "
+                                        + clase.getId(),
+                                e
+                        );
+                    }
                 }
             }
         }

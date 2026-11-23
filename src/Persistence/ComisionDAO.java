@@ -1,5 +1,6 @@
 package Persistence;
 
+import Exceptions.ElementoRepetidoException;
 import Models.Alumno;
 import Models.Comision;
 
@@ -210,12 +211,20 @@ public class ComisionDAO {
             ps.setString(1, comision.getId().toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    comision.agregarAlumno(new Alumno(
-                            UUID.fromString(rs.getString("id")),
-                            rs.getString("nombre"),
-                            rs.getString("apellido"),
-                            rs.getObject("anio_ingreso", Integer.class)
-                    ));
+                    try {
+                        comision.agregarAlumno(new Alumno(
+                                UUID.fromString(rs.getString("id")),
+                                rs.getString("nombre"),
+                                rs.getString("apellido"),
+                                rs.getObject("anio_ingreso", Integer.class)
+                        ));
+                    } catch (ElementoRepetidoException e) {
+                        throw new SQLException(
+                                "La base contiene un alumno duplicado para la comisión "
+                                        + comision.getId(),
+                                e
+                        );
+                    }
                 }
             }
         }
