@@ -168,7 +168,7 @@ public class Menu {
                 try {
                     System.out.println(cursable.listarAsistencias());
                 } catch (AlumnosVacioException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e.getMessage());
                 }
                 break;
             case 3:
@@ -423,9 +423,9 @@ public class Menu {
     }
 
     public ClaseIndividual crearClaseParticular(){
-        System.out.println("¿A que hora se cursa esta clase? (solo hora en punto de 1 a 24)");
+        System.out.println("¿A que hora se cursa esta clase? (solo hora en punto de 1 a 23)");
         System.out.println("Ten en cuenta que la hora no se puede cambiar");
-        int hora = menu.Verificador.leerNumeroPositivoMinMax(1,24);
+        int hora = menu.Verificador.leerNumeroPositivoMinMax(1,23);
 
         System.out.println("Ingrese el mes(1/12): ");
         int mes = menu.Verificador.leerNumeroPositivoMinMax(1,12);
