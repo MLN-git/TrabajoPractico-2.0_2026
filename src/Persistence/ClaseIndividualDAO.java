@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class ClaseIndividualDAO {
-    public void guardarClase(ClaseIndividual clase, UUID materiaId) throws SQLException {
+    public void guardarClase(ClaseIndividual clase, UUID materiaId, UUID usuarioId)
+            throws SQLException {
         String sqlCursable = """
                 INSERT INTO cursables (id, materia_id, tipo, nombre) VALUES (?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE materia_id = VALUES(materia_id),
@@ -28,6 +29,8 @@ public class ClaseIndividualDAO {
             conexion.setAutoCommit(false);
             try (PreparedStatement psCursable = conexion.prepareStatement(sqlCursable);
                  PreparedStatement psClase = conexion.prepareStatement(sqlClase)) {
+                verificarCursableDisponible(conexion, clase.getId(), usuarioId);
+                verificarMateriaUsuario(conexion, materiaId, usuarioId);
                 psCursable.setString(1, clase.getId().toString());
                 psCursable.setString(2, materiaId.toString());
                 psCursable.setString(3, "INDIVIDUAL");
@@ -49,26 +52,33 @@ public class ClaseIndividualDAO {
         }
     }
 
-    public void eliminarClase(UUID id) throws SQLException {
-        String sql = "DELETE FROM cursables WHERE id = ? AND tipo = 'INDIVIDUAL'";
+    public void eliminarClase(UUID id, UUID usuarioId) throws SQLException {
+        String sql = """
+                DELETE c FROM cursables c
+                JOIN materias m ON m.id = c.materia_id
+                WHERE c.id = ? AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
+                """;
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id.toString());
+            ps.setString(2, usuarioId.toString());
             ps.executeUpdate();
         }
     }
 
-    public ClaseIndividual obtenerClasePorId(UUID id) throws SQLException {
+    public ClaseIndividual obtenerClasePorId(UUID id, UUID usuarioId) throws SQLException {
         String sql = """
                 SELECT c.id, c.nombre, ci.fecha_y_hora
                 FROM cursables c
                 JOIN clases_individuales ci ON ci.cursable_id = c.id
-                WHERE c.id = ? AND c.tipo = 'INDIVIDUAL'
+                JOIN materias m ON m.id = c.materia_id
+                WHERE c.id = ? AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
                 """;
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, id.toString());
+            ps.setString(2, usuarioId.toString());
             ClaseIndividual clase;
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
@@ -81,20 +91,28 @@ public class ClaseIndividualDAO {
                         rs.getString("nombre")
                 );
             }
-            cargarAlumnos(conexion, clase);
-            cargarAsistencia(conexion, clase);
+            cargarAlumnos(conexion, clase, usuarioId);
+            cargarAsistencia(conexion, clase, usuarioId);
             return clase;
         }
     }
 
-    public List<ClaseIndividual> listarPorMateria(UUID materiaId) throws SQLException {
-        String sql = "SELECT id FROM cursables "
-                + "WHERE materia_id = ? AND tipo = 'INDIVIDUAL' ORDER BY nombre";
+    public List<ClaseIndividual> listarPorMateria(UUID materiaId, UUID usuarioId)
+            throws SQLException {
+        String sql = """
+                SELECT c.id
+                FROM cursables c
+                JOIN materias m ON m.id = c.materia_id
+                WHERE c.materia_id = ? AND c.tipo = 'INDIVIDUAL'
+                    AND m.usuario_id = ?
+                ORDER BY c.nombre
+                """;
         List<UUID> ids = new ArrayList<>();
 
         try (Connection conexion = ConexionDB.abrir();
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, materiaId.toString());
+            ps.setString(2, usuarioId.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ids.add(UUID.fromString(rs.getString("id")));
@@ -104,7 +122,7 @@ public class ClaseIndividualDAO {
 
         List<ClaseIndividual> clases = new ArrayList<>();
         for (UUID id : ids) {
-            ClaseIndividual clase = obtenerClasePorId(id);
+            ClaseIndividual clase = obtenerClasePorId(id, usuarioId);
             if (clase != null) {
                 clases.add(clase);
             }
@@ -112,23 +130,46 @@ public class ClaseIndividualDAO {
         return clases;
     }
 
-    public void guardarAlumnos(UUID claseId, Collection<Alumno> alumnos) throws SQLException {
-        String borrar = "DELETE FROM cursable_alumnos WHERE cursable_id = ?";
-        String insertar = "INSERT INTO cursable_alumnos (cursable_id, alumno_id) VALUES (?, ?)";
-
+    public void guardarAlumnos(
+            UUID claseId, Collection<Alumno> alumnos, UUID usuarioId) throws SQLException {
+        String borrar = """
+                DELETE ca FROM cursable_alumnos ca
+                JOIN cursables c ON c.id = ca.cursable_id
+                JOIN materias m ON m.id = c.materia_id
+                WHERE ca.cursable_id = ? AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
+                """;
+        String insertar = """
+                INSERT INTO cursable_alumnos (cursable_id, alumno_id)
+                SELECT ?, a.id
+                FROM alumnos a
+                JOIN cursables c ON c.id = ?
+                JOIN materias m ON m.id = c.materia_id
+                WHERE a.id = ? AND a.usuario_id = ? AND c.tipo = 'INDIVIDUAL'
+                    AND m.usuario_id = ?
+                """;
         try (Connection conexion = ConexionDB.abrir()) {
             conexion.setAutoCommit(false);
-            try (PreparedStatement psBorrar = conexion.prepareStatement(borrar);
-                 PreparedStatement psInsertar = conexion.prepareStatement(insertar)) {
-                psBorrar.setString(1, claseId.toString());
-                psBorrar.executeUpdate();
-
-                for (Alumno alumno : alumnos) {
-                    psInsertar.setString(1, claseId.toString());
-                    psInsertar.setString(2, alumno.getId().toString());
-                    psInsertar.addBatch();
+            try {
+                verificarPropiedadCursable(conexion, claseId, usuarioId);
+                try (PreparedStatement psBorrar = conexion.prepareStatement(borrar)) {
+                    psBorrar.setString(1, claseId.toString());
+                    psBorrar.setString(2, usuarioId.toString());
+                    psBorrar.executeUpdate();
                 }
-                psInsertar.executeBatch();
+
+                try (PreparedStatement psInsertar = conexion.prepareStatement(insertar)) {
+                    for (Alumno alumno : alumnos) {
+                        psInsertar.setString(1, claseId.toString());
+                        psInsertar.setString(2, claseId.toString());
+                        psInsertar.setString(3, alumno.getId().toString());
+                        psInsertar.setString(4, usuarioId.toString());
+                        psInsertar.setString(5, usuarioId.toString());
+                        if (psInsertar.executeUpdate() != 1) {
+                            throw new SQLException(
+                                    "El alumno no pertenece al usuario o la clase no existe");
+                        }
+                    }
+                }
                 conexion.commit();
             } catch (SQLException e) {
                 try {
@@ -141,18 +182,19 @@ public class ClaseIndividualDAO {
         }
     }
 
-    public void guardarAsistencia(ClaseIndividual clase) throws SQLException {
+    public void guardarAsistencia(ClaseIndividual clase, UUID usuarioId) throws SQLException {
         if (!clase.isAsistenciaTomada()) {
             throw new IllegalStateException("Primero hay que tomar la asistencia de la clase");
         }
         LocalDate fecha = clase.getFechaYHora().toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate();
-        guardarAsistencia(clase.getId(), fecha, clase.getElegibles(), clase.getAsistencia());
+        guardarAsistencia(
+                clase.getId(), fecha, clase.getElegibles(), clase.getAsistencia(), usuarioId);
     }
 
     private void guardarAsistencia(
             UUID cursableId, LocalDate fecha, Collection<Alumno> alumnos,
-            Collection<Alumno> presentes) throws SQLException {
+            Collection<Alumno> presentes, UUID usuarioId) throws SQLException {
         String crearSesion = """
                 INSERT INTO asistencia_sesiones (id, cursable_id, fecha) VALUES (?, ?, ?)
                 ON DUPLICATE KEY UPDATE fecha = VALUES(fecha)
@@ -163,12 +205,19 @@ public class ClaseIndividualDAO {
         String borrarDetalle = "DELETE FROM asistencia_detalle WHERE sesion_id = ?";
         String insertarDetalle = """
                 INSERT INTO asistencia_detalle (sesion_id, alumno_id, presente)
-                VALUES (?, ?, ?)
+                SELECT ?, a.id, ?
+                FROM alumnos a
+                JOIN cursable_alumnos ca ON ca.alumno_id = a.id
+                JOIN cursables c ON c.id = ca.cursable_id
+                JOIN materias m ON m.id = c.materia_id
+                WHERE a.id = ? AND a.usuario_id = ? AND c.id = ?
+                    AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
                 """;
 
         try (Connection conexion = ConexionDB.abrir()) {
             conexion.setAutoCommit(false);
             try {
+                verificarPropiedadCursable(conexion, cursableId, usuarioId);
                 try (PreparedStatement ps = conexion.prepareStatement(crearSesion)) {
                     ps.setString(1, UUID.randomUUID().toString());
                     ps.setString(2, cursableId.toString());
@@ -196,11 +245,16 @@ public class ClaseIndividualDAO {
                 try (PreparedStatement ps = conexion.prepareStatement(insertarDetalle)) {
                     for (Alumno alumno : alumnos) {
                         ps.setString(1, sesionId);
-                        ps.setString(2, alumno.getId().toString());
-                        ps.setBoolean(3, presentes.contains(alumno));
-                        ps.addBatch();
+                        ps.setBoolean(2, presentes.contains(alumno));
+                        ps.setString(3, alumno.getId().toString());
+                        ps.setString(4, usuarioId.toString());
+                        ps.setString(5, cursableId.toString());
+                        ps.setString(6, usuarioId.toString());
+                        if (ps.executeUpdate() != 1) {
+                            throw new SQLException(
+                                    "El alumno no pertenece al usuario o no está asignado a la clase");
+                        }
                     }
-                    ps.executeBatch();
                 }
                 conexion.commit();
             } catch (SQLException e) {
@@ -214,14 +268,16 @@ public class ClaseIndividualDAO {
         }
     }
 
-    private void cargarAlumnos(Connection conexion, ClaseIndividual clase) throws SQLException {
+    private void cargarAlumnos(
+            Connection conexion, ClaseIndividual clase, UUID usuarioId) throws SQLException {
         String sql = """
                 SELECT a.id, a.nombre, a.apellido, a.anio_ingreso
                 FROM cursable_alumnos ca JOIN alumnos a ON a.id = ca.alumno_id
-                WHERE ca.cursable_id = ?
+                WHERE ca.cursable_id = ? AND a.usuario_id = ?
                 """;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, clase.getId().toString());
+            ps.setString(2, usuarioId.toString());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     try {
@@ -243,7 +299,8 @@ public class ClaseIndividualDAO {
         }
     }
 
-    private void cargarAsistencia(Connection conexion, ClaseIndividual clase) throws SQLException {
+    private void cargarAsistencia(
+            Connection conexion, ClaseIndividual clase, UUID usuarioId) throws SQLException {
         LocalDate fecha = clase.getFechaYHora().toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate();
         String sql = """
@@ -251,13 +308,14 @@ public class ClaseIndividualDAO {
                 FROM asistencia_sesiones s
                 LEFT JOIN asistencia_detalle d
                     ON d.sesion_id = s.id AND d.presente = TRUE
-                LEFT JOIN alumnos a ON a.id = d.alumno_id
+                LEFT JOIN alumnos a ON a.id = d.alumno_id AND a.usuario_id = ?
                 WHERE s.cursable_id = ? AND s.fecha = ?
                 """;
         boolean asistenciaEncontrada = false;
         try (PreparedStatement ps = conexion.prepareStatement(sql)) {
-            ps.setString(1, clase.getId().toString());
-            ps.setDate(2, Date.valueOf(fecha));
+            ps.setString(1, usuarioId.toString());
+            ps.setString(2, clase.getId().toString());
+            ps.setDate(3, Date.valueOf(fecha));
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     asistenciaEncontrada = true;
@@ -275,6 +333,57 @@ public class ClaseIndividualDAO {
         }
         if (asistenciaEncontrada) {
             clase.marcarAsistenciaTomada();
+        }
+    }
+
+    private void verificarMateriaUsuario(
+            Connection conexion, UUID materiaId, UUID usuarioId) throws SQLException {
+        String sql = "SELECT 1 FROM materias WHERE id = ? AND usuario_id = ?";
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, materiaId.toString());
+            ps.setString(2, usuarioId.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("La materia no pertenece al usuario");
+                }
+            }
+        }
+    }
+
+    private void verificarPropiedadCursable(
+            Connection conexion, UUID cursableId, UUID usuarioId) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM cursables c
+                JOIN materias m ON m.id = c.materia_id
+                WHERE c.id = ? AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
+                """;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, cursableId.toString());
+            ps.setString(2, usuarioId.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) {
+                    throw new SQLException("La clase no pertenece al usuario");
+                }
+            }
+        }
+    }
+
+    private void verificarCursableDisponible(
+            Connection conexion, UUID cursableId, UUID usuarioId) throws SQLException {
+        String sql = """
+                SELECT m.usuario_id
+                FROM cursables c
+                JOIN materias m ON m.id = c.materia_id
+                WHERE c.id = ?
+                """;
+        try (PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, cursableId.toString());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && !usuarioId.toString().equals(rs.getString("usuario_id"))) {
+                    throw new SQLException("El identificador de clase pertenece a otro usuario");
+                }
+            }
         }
     }
 }

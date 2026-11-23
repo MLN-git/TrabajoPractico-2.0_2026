@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/src/Persistence/AlumnoDAO.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+    <file url="file://$PROJECT_DIR$/src/Persistence/ClaseIndividualDAO.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+    <file url="file://$PROJECT_DIR$/src/Persistence/ComisionDAO.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+    <file url="file://$PROJECT_DIR$/src/Persistence/ConexionDB.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+    <file url="file://$PROJECT_DIR$/src/Persistence/MateriaDAO.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+    <file url="file://$PROJECT_DIR$/src/Persistence/UsuarioDAO.java" value="a4f913fd-d971-4e5a-aa33-73d3b10b5d19" />
+  </component>
+</project>
