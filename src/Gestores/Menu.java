@@ -454,6 +454,8 @@ public class Menu {
             sesion.agregarAlumno(alumno);
         } catch (ElementoRepetidoException e) {
             System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("El alumno no ha podido ser agregado a la base de datos");
         }
     }
 
