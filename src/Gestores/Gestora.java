@@ -71,11 +71,12 @@ public class Gestora implements IElegible<Materia> {
         alumnosExistentes.put(alumno.getId(), alumno);
     }
 
-    public void agregarMateria(Materia materia) throws ElementoRepetidoException {
-        if (!(materiasExistentes.add(materia))){
+    public void agregarMateria(Materia materia) throws ElementoRepetidoException, SQLException {
+        if (materiasExistentes.contains(materia.getId())) {
             throw new ElementoRepetidoException("El id de la materia ya está en la cuenta");
         }
         materiaDAO.guardarMateria(materia, usuario.getId());
+        materiasExistentes.add(materia);
     }
 
 //  Ningun alumno deberia ser eliminado, simplemente quedan en la db y se levantan segun el usuario pero no se eliminan

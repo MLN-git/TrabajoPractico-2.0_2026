@@ -10,6 +10,7 @@ import Models.ClaseIndividual;
 import Models.Comision;
 import Models.Materia;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -117,7 +118,7 @@ public class Menu {
                                     menu.Verificador.leerNombre(
                                             "Escriba el primer nombre del alumno sin espacios: "));
                 } catch (AlumnosVacioException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
 
@@ -134,7 +135,7 @@ public class Menu {
 
                     }
                 } catch (AlumnosVacioException e) {
-                    throw new RuntimeException(e);
+                    System.out.println(e.getMessage());
                 }
                 break;
             case 4:
@@ -397,6 +398,8 @@ public class Menu {
         if (!(materia == null)){
             try {
                 sesion.agregarMateria(materia);
+            } catch (SQLException e){
+                System.out.println("No se pudo eliminar de la base de datos");
             } catch (ElementoRepetidoException e) {
                 System.out.println(e.getMessage());
             }
@@ -406,10 +409,11 @@ public class Menu {
     public void eliminarMateria(Materia materia){
         try{
             sesion.darBajaMateria(materia);
+            System.out.println("Materia eliminada");
         }catch (NoSeEncontroElElementoException e){
             System.out.println(e.getMessage());
-        }catch (Exception e){
-            System.out.println(e.getMessage());
+        }catch (SQLException e){
+            System.out.println("No se pudo eliminar de la base de datos");
         }
     }
 
