@@ -66,6 +66,25 @@ public class ClaseIndividualDAO {
         }
     }
 
+    public void actualizarNombre(UUID id, String nombre, UUID usuarioId) throws SQLException {
+        String sql = """
+                UPDATE cursables c
+                JOIN materias m ON m.id = c.materia_id
+                SET c.nombre = ?
+                WHERE c.id = ? AND c.tipo = 'INDIVIDUAL' AND m.usuario_id = ?
+                """;
+        try (Connection conexion = ConexionDB.abrir();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, id.toString());
+            ps.setString(3, usuarioId.toString());
+            int filas = ps.executeUpdate();
+            if (filas == 0) {
+                verificarPropiedadCursable(conexion, id, usuarioId);
+            }
+        }
+    }
+
     public ClaseIndividual obtenerClasePorId(UUID id, UUID usuarioId) throws SQLException {
         String sql = """
                 SELECT c.id, c.nombre, ci.fecha_y_hora
@@ -192,7 +211,7 @@ public class ClaseIndividualDAO {
                 clase.getId(), fecha, clase.getElegibles(), clase.getAsistencia(), usuarioId);
     }
 
-    private void guardarAsistencia(
+    public void guardarAsistencia(
             UUID cursableId, LocalDate fecha, Collection<Alumno> alumnos,
             Collection<Alumno> presentes, UUID usuarioId) throws SQLException {
         String crearSesion = """

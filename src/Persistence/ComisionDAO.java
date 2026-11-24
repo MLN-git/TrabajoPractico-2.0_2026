@@ -65,6 +65,25 @@ public class ComisionDAO {
         }
     }
 
+    public void actualizarNombre(UUID id, String nombre, UUID usuarioId) throws SQLException {
+        String sql = """
+                UPDATE cursables c
+                JOIN materias m ON m.id = c.materia_id
+                SET c.nombre = ?
+                WHERE c.id = ? AND c.tipo = 'COMISIONADA' AND m.usuario_id = ?
+                """;
+        try (Connection conexion = ConexionDB.abrir();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, id.toString());
+            ps.setString(3, usuarioId.toString());
+            int filas = ps.executeUpdate();
+            if (filas == 0) {
+                verificarPropiedadCursable(conexion, id, usuarioId);
+            }
+        }
+    }
+
     public Comision obtenerComisionPorId(UUID id, UUID usuarioId) throws SQLException {
         String sql = """
                 SELECT c.id, c.nombre, co.anio
@@ -183,6 +202,12 @@ public class ComisionDAO {
         if (presentes == null) {
             throw new IllegalArgumentException("No hay una asistencia registrada para " + fecha);
         }
+        guardarAsistencia(comision.getId(), fecha, comision.getElegibles(), presentes, usuarioId);
+    }
+
+    public void guardarAsistencia(
+            UUID comisionId, LocalDate fecha, Collection<Alumno> elegibles,
+            Collection<Alumno> presentes, UUID usuarioId) throws SQLException {
         String crearSesion = """
                 INSERT INTO asistencia_sesiones (id, cursable_id, fecha) VALUES (?, ?, ?)
                 ON DUPLICATE KEY UPDATE fecha = VALUES(fecha)
@@ -205,17 +230,17 @@ public class ComisionDAO {
         try (Connection conexion = ConexionDB.abrir()) {
             conexion.setAutoCommit(false);
             try {
-                verificarPropiedadCursable(conexion, comision.getId(), usuarioId);
+                verificarPropiedadCursable(conexion, comisionId, usuarioId);
                 try (PreparedStatement ps = conexion.prepareStatement(crearSesion)) {
                     ps.setString(1, UUID.randomUUID().toString());
-                    ps.setString(2, comision.getId().toString());
+                    ps.setString(2, comisionId.toString());
                     ps.setDate(3, Date.valueOf(fecha));
                     ps.executeUpdate();
                 }
 
                 String sesionId;
                 try (PreparedStatement ps = conexion.prepareStatement(obtenerSesion)) {
-                    ps.setString(1, comision.getId().toString());
+                    ps.setString(1, comisionId.toString());
                     ps.setDate(2, Date.valueOf(fecha));
                     try (ResultSet rs = ps.executeQuery()) {
                         if (!rs.next()) {
@@ -231,12 +256,12 @@ public class ComisionDAO {
                 }
 
                 try (PreparedStatement ps = conexion.prepareStatement(insertarDetalle)) {
-                    for (Alumno alumno : comision.getElegibles()) {
+                    for (Alumno alumno : elegibles) {
                         ps.setString(1, sesionId);
                         ps.setBoolean(2, presentes.contains(alumno));
                         ps.setString(3, alumno.getId().toString());
                         ps.setString(4, usuarioId.toString());
-                        ps.setString(5, comision.getId().toString());
+                        ps.setString(5, comisionId.toString());
                         ps.setString(6, usuarioId.toString());
                         if (ps.executeUpdate() != 1) {
                             throw new SQLException(

@@ -11,10 +11,12 @@ import Models.Comision;
 import Models.Materia;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 import static menu.Verificador.*;
@@ -114,9 +116,12 @@ public class Menu {
                 break;
             case 2:
                 try {
-                    elegirOpcion(sesion.getAlumnosElegibles()).setNombre(
-                                    menu.Verificador.leerNombre(
-                                            "Escriba el primer nombre del alumno sin espacios: "));
+                    Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
+                    String nombre = menu.Verificador.leerNombre(
+                            "Escriba el primer nombre del alumno sin espacios: ");
+                    sesion.actualizarNombreAlumno(alumno, nombre);
+                } catch (SQLException e) {
+                    System.out.println("No se pudo actualizar el alumno en la base de datos");
                 } catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
@@ -126,16 +131,16 @@ public class Menu {
                 break;
             case 3:
                 try {
-                    try {
-                        elegirOpcion(sesion.getAlumnosElegibles()).setApellido(
-                                menu.Verificador.leerNombre(
-                                        "Escriba el primer apellido del alumno sin espacios: "));
-                    } catch (SinElementosException e) {
-                        System.out.println(e.getMessage());
-
-                    }
+                    Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
+                    String apellido = menu.Verificador.leerNombre(
+                            "Escriba el primer apellido del alumno sin espacios: ");
+                    sesion.actualizarApellidoAlumno(alumno, apellido);
                 } catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
+                } catch (SinElementosException e) {
+                    System.out.println(e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("No se pudo actualizar el alumno en la base de datos");
                 }
                 break;
             case 4:
@@ -157,13 +162,7 @@ public class Menu {
 
         switch (menu.Verificador.leerNumeroPositivoMinMax(1,5)){
             case 1:
-                try {
-                    cursable.tomarAsistencia();
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (AsistenciaYaTomadaException e){
-                    System.out.println(e.getMessage());
-                }
+                tomarAsistenciaPersistida(cursable);
                 break;
             case 2:
                 try {
@@ -174,20 +173,24 @@ public class Menu {
                 break;
             case 3:
                 try {
-                    cursable.agregarPresente(elegirOpcion(cursable.getElegibles()));
+                    sesion.agregarPresente(cursable, elegirOpcion(cursable.getElegibles()));
                 } catch (NoSeEncontroElElementoException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("No se pudo guardar la asistencia en la base de datos");
                 }
                 break;
             case 4:
                 try {
-                    cursable.eliminarPresente(elegirOpcion(cursable.getElegibles()));
+                    sesion.eliminarPresente(cursable, elegirOpcion(cursable.getElegibles()));
                 } catch (NoSeEncontroElElementoException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("No se pudo guardar la asistencia en la base de datos");
                 }
                 break;
             case 5:
@@ -211,31 +214,41 @@ public class Menu {
                     case PARTICULAR:
 
                         try {
-                            materia.agregarCursable(crearClaseParticular());
+                            sesion.agregarCursable(materia, crearClaseParticular());
                         } catch (ElementoRepetidoException e) {
                             System.out.println(e.getMessage());
+                        } catch (SQLException e) {
+                            System.out.println("No se pudo guardar la clase en la base de datos");
                         }
                         break;
 
                     case COMISIONADA:
                         try {
-                            materia.agregarCursable(crearComision());
+                            sesion.agregarCursable(materia, crearComision());
                         }catch (ElementoRepetidoException e) {
                             System.out.println(e.getMessage());
+                        } catch (SQLException e) {
+                            System.out.println("No se pudo guardar la comisión en la base de datos");
                         }
                 }
                 break;
             case 2:
                 try {
-                    materia.eliminarCursable(extraerElegibles(materia));
+                    sesion.darBajaCursable(materia, extraerElegibles(materia));
                 }catch (NoSeEncontroElElementoException e){
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("No se pudo eliminar el cursable de la base de datos");
                 }
                 break;
             case 3:
-                materia.setNombre(leerNombre("Escriba el nuevo nombre"));
+                try {
+                    sesion.actualizarNombreMateria(materia, leerNombre("Escriba el nuevo nombre"));
+                } catch (SQLException e) {
+                    System.out.println("No se pudo actualizar la materia en la base de datos");
+                }
                 break;
             case 4:
                 try {
@@ -262,36 +275,43 @@ public class Menu {
         switch (opcion) {
             case 1:
                 try {
-                    // Esta línea de codigo es ARTE RENACENTISTA
-                    curso.agregarAlumno(elegirOpcion(sesion.getAlumnosElegibles()));
+                    sesion.agregarAlumnoACursable(
+                            curso, elegirOpcion(sesion.getAlumnosElegibles()));
                 } catch (ElementoRepetidoException e) {
                     System.out.println(e.getMessage());
                 } catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
-
+                } catch (SQLException e) {
+                    System.out.println("No se pudo guardar el alumno en la base de datos");
                 }
                 break;
             case 2:
                 try {
-                    curso.eliminarAlumno(elegirOpcion(sesion.getAlumnosElegibles()));
+                    sesion.eliminarAlumnoDeCursable(
+                            curso, elegirOpcion(sesion.getAlumnosElegibles()));
                 }catch (NoSeEncontroElElementoException e){
                     System.out.println(e.getMessage());
                 }catch (AlumnosVacioException e) {
                     System.out.println(e.getMessage());
                 } catch (SinElementosException e) {
                     System.out.println(e.getMessage());
+                } catch (SQLException e) {
+                    System.out.println("No se pudo eliminar el alumno de la base de datos");
                 }
                 break;
             case 3:
-                curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+                try {
+                    sesion.actualizarNombreCursable(
+                            curso, menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+                } catch (SQLException e) {
+                    System.out.println("No se pudo actualizar el cursable en la base de datos");
+                }
                 break;
             case 4:
                 break;
         }
-//        curso.setNombre(menu.Verificador.leerNombre("Escriba el nuevo nombre"));
-
     }
 
     // Eureka 4.0
@@ -399,7 +419,7 @@ public class Menu {
             try {
                 sesion.agregarMateria(materia);
             } catch (SQLException e){
-                System.out.println("No se pudo eliminar de la base de datos");
+                System.out.println("No se pudo guardar la materia en la base de datos");
             } catch (ElementoRepetidoException e) {
                 System.out.println(e.getMessage());
             }
@@ -455,7 +475,35 @@ public class Menu {
         } catch (ElementoRepetidoException e) {
             System.out.println(e.getMessage());
         } catch (SQLException e) {
-            System.out.println("El alumno no ha podido ser agregado a la base de datos");
+            System.out.println("No se pudo guardar el alumno en la base de datos");
+        }
+    }
+
+    private void tomarAsistenciaPersistida(ICursable cursable) {
+        try {
+            if (cursable.getElegibles().isEmpty()) {
+                throw new AlumnosVacioException("No hay alumnos asignados a la clase");
+            }
+            if (cursable instanceof Comision comision
+                    && comision.getAsistencias().containsKey(LocalDate.now())) {
+                throw new AsistenciaYaTomadaException("La asistencia ya ha sido tomada hoy");
+            }
+            if (cursable instanceof ClaseIndividual clase && clase.isAsistenciaTomada()) {
+                throw new AsistenciaYaTomadaException(
+                        "La asistencia de esta clase ya está tomada");
+            }
+
+            HashSet<Alumno> presentes = new HashSet<>();
+            for (Alumno alumno : cursable.getElegibles()) {
+                if (consultarAlumno(alumno)) {
+                    presentes.add(alumno);
+                }
+            }
+            sesion.guardarAsistencia(cursable, presentes);
+        } catch (AlumnosVacioException | AsistenciaYaTomadaException | SinElementosException e) {
+            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("No se pudo guardar la asistencia en la base de datos");
         }
     }
 
