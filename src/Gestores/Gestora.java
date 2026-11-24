@@ -80,6 +80,7 @@ public class Gestora implements IElegible<Materia> {
                 alumno.getId(), nombre, alumno.getApellido(), alumno.getAnioIngreso());
         alumnoDAO.actualizarAlumno(actualizado, usuario.getId());
         alumno.setNombre(nombre);
+        recargarMaterias();
     }
 
     public void actualizarApellidoAlumno(Alumno alumno, String apellido) throws SQLException {
@@ -87,6 +88,7 @@ public class Gestora implements IElegible<Materia> {
                 alumno.getId(), alumno.getNombre(), apellido, alumno.getAnioIngreso());
         alumnoDAO.actualizarAlumno(actualizado, usuario.getId());
         alumno.setApellido(apellido);
+        recargarMaterias();
     }
 
     public void agregarMateria(Materia materia) throws ElementoRepetidoException, SQLException {
@@ -253,5 +255,10 @@ public class Gestora implements IElegible<Materia> {
             return ci.isAsistenciaTomada();
         }
         throw new IllegalArgumentException("Tipo de cursable no soportado");
+    }
+
+    private void recargarMaterias() throws SQLException {
+        materiasExistentes.clear();
+        materiasExistentes.addAll(materiaDAO.listarCompletas(usuario.getId()));
     }
 }
