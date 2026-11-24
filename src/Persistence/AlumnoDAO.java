@@ -66,6 +66,31 @@ public class AlumnoDAO {
         }
     }
 
+    public void actualizarAlumno(Alumno alumno, UUID usuarioId) throws SQLException {
+        String sql = """
+                UPDATE alumnos
+                SET nombre = ?, apellido = ?, anio_ingreso = ?
+                WHERE id = ? AND usuario_id = ?
+                """;
+
+        try (Connection conexion = ConexionDB.abrir();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, alumno.getNombre());
+            ps.setString(2, alumno.getApellido());
+            if (alumno.getAnioIngreso() == null) {
+                ps.setNull(3, Types.INTEGER);
+            } else {
+                ps.setInt(3, alumno.getAnioIngreso());
+            }
+            ps.setString(4, alumno.getId().toString());
+            ps.setString(5, usuarioId.toString());
+            int filas = ps.executeUpdate();
+            if (filas == 0 && obtenerAlumnoPorId(alumno.getId(), usuarioId) == null) {
+                throw new SQLException("El alumno no pertenece al usuario");
+            }
+        }
+    }
+
     public void guardarTodos(Collection<Alumno> alumnos, UUID usuarioId) throws SQLException {
         String sql = """
                 INSERT INTO alumnos (id, usuario_id, nombre, apellido, anio_ingreso)

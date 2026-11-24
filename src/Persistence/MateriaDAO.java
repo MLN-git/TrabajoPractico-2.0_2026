@@ -61,6 +61,21 @@ public class MateriaDAO {
         }
     }
 
+    public void actualizarNombre(UUID id, String nombre, UUID usuarioId) throws SQLException {
+        String sql = "UPDATE materias SET nombre = ? WHERE id = ? AND usuario_id = ?";
+
+        try (Connection conexion = ConexionDB.abrir();
+             PreparedStatement ps = conexion.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, id.toString());
+            ps.setString(3, usuarioId.toString());
+            int filas = ps.executeUpdate();
+            if (filas == 0 && obtenerMateriaPorId(id, usuarioId) == null) {
+                throw new SQLException("La materia no pertenece al usuario");
+            }
+        }
+    }
+
     public void guardarTodos(Collection<Materia> materias, UUID usuarioId) throws SQLException {
         String sql = """
                 INSERT INTO materias (id, usuario_id, nombre, tipo_materia)
