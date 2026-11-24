@@ -34,10 +34,10 @@ public class Menu {
     // Terminado
     public void mostrarMenu(){
         do {
-            System.out.println("---MENU---\n\n");
-            System.out.println("1 - Materias\n");
-            System.out.println("2 - Alumnos\n");
-            System.out.println("3 - Salir\n");
+            System.out.println("---MENU---\n");
+            System.out.println("1 - Materias");
+            System.out.println("2 - Alumnos");
+            System.out.println("3 - Salir");
             opcionMenu = menu.Verificador.leerNumeroPositivoMinMax(1,3);
 
             switch (opcionMenu){
@@ -62,256 +62,278 @@ public class Menu {
 
     // Terminado
     public void menuMaterias(){
-        System.out.println("---MATERIAS---\n\n");
-        System.out.println("1 - Crear Materia\n");
-        System.out.println("2 - Editar Materia\n");
-        System.out.println("3 - Eliminar Materia\n");
-        System.out.println("4 - Asistencia\n");
-        System.out.println("5 - Atrás\n");
+        int opcion;
+        do{
+            System.out.println("---MATERIAS---\n");
+            System.out.println("1 - Crear Materia");
+            System.out.println("2 - Editar Materia");
+            System.out.println("3 - Eliminar Materia");
+            System.out.println("4 - Asistencia");
+            System.out.println("5 - Atrás");
 
-        int opcion =  leerNumeroPositivoMinMax(1,5);
+            opcion =  leerNumeroPositivoMinMax(1,5);
 
-        switch (opcion){
-            case 1:
-                crearMateria();
-                break;
-            case 2:
-                try {
-                    menuEditarMateria(extraerElegibles(sesion));
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 3:
-                try {
-                    eliminarMateria(extraerElegibles(sesion));
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 4:
-                try {
-                    menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 5:
-                break;
-        }
+            switch (opcion){
+                case 1:
+                    crearMateria();
+                    break;
+                case 2:
+                    try {
+                        menuEditarMateria(extraerElegibles(sesion));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 3:
+                    try {
+                        eliminarMateria(extraerElegibles(sesion));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 4:
+                    try {
+                        menuAsistencia(extraerElegibles(extraerElegibles(sesion)));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 5:
+                    break;
+            }
+        }  while (opcion != 5);
     }
 
     // Terminado
     public void menuAlumnos(){
-        // Agregar opciones del menu alumnos
-        System.out.println("---ALUMNOS---\n\n");
-        System.out.println("1 - Crear Alumno\n");
-        System.out.println("2 - Cambiar nombre\n");
-        System.out.println("3 - Cambiar apellido\n");
-        System.out.println("4 - Atrás");
+        int opcion;
+        do {
+            System.out.println("---ALUMNOS---\n");
+            System.out.println("1 - Crear Alumno");
+            System.out.println("2 - Cambiar nombre");
+            System.out.println("3 - Cambiar apellido");
+            System.out.println("4 - Atrás");
+            opcion = leerNumeroPositivoMinMax(1, 4);
 
-        switch (leerNumeroPositivoMinMax(1,4)){
-            case 1:
-                crearAlumno();
-                break;
-            case 2:
-                try {
-                    Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
-                    String nombre = menu.Verificador.leerNombre(
-                            "Escriba el primer nombre del alumno sin espacios: ");
-                    sesion.actualizarNombreAlumno(alumno, nombre);
-                } catch (SQLException e) {
-                    System.out.println("No se pudo actualizar el alumno en la base de datos");
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
+            switch (opcion) {
+                case 1:
+                    crearAlumno();
+                    break;
+                case 2:
+                    try {
+                        Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
+                        String nombre = menu.Verificador.leerNombre(
+                                "Escriba el primer nombre del alumno sin espacios: ");
+                        sesion.actualizarNombreAlumno(alumno, nombre);
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo actualizar el alumno en la base de datos");
+                    } catch (AlumnosVacioException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
 
-                }
-                break;
-            case 3:
-                try {
-                    Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
-                    String apellido = menu.Verificador.leerNombre(
-                            "Escriba el primer apellido del alumno sin espacios: ");
-                    sesion.actualizarApellidoAlumno(alumno, apellido);
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo actualizar el alumno en la base de datos");
-                }
-                break;
-            case 4:
-                break;
-        }
+                    }
+                    break;
+                case 3:
+                    try {
+                        Alumno alumno = elegirOpcion(sesion.getAlumnosElegibles());
+                        String apellido = menu.Verificador.leerNombre(
+                                "Escriba el primer apellido del alumno sin espacios: ");
+                        sesion.actualizarApellidoAlumno(alumno, apellido);
+                    } catch (AlumnosVacioException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo actualizar el alumno en la base de datos");
+                    }
+                    break;
+                case 4:
+                    break;
+            }
+        } while (opcion != 4);
 
 
     }
 
     // Terminado
     public void menuAsistencia(ICursable cursable){
-        System.out.println("--MENU ASISTENCIA---\n\n");
-        System.out.println("1 - Tomar asistencia\n");
-        System.out.println("2 - Listar asistencias\n");
-        System.out.println("3 - Agregar asistencia individual\n");
-        System.out.println("4 - Eliminar asistencia individual\n");
-        System.out.println("5 - Atrás\n");
+        int opcion;
+        do {
+            System.out.println("--MENU ASISTENCIA---\n");
+            System.out.println("1 - Tomar asistencia");
+            System.out.println("2 - Listar asistencias");
+            System.out.println("3 - Agregar asistencia individual");
+            System.out.println("4 - Eliminar asistencia individual");
+            System.out.println("5 - Atrás");
 
-
-        switch (menu.Verificador.leerNumeroPositivoMinMax(1,5)){
-            case 1:
-                tomarAsistenciaPersistida(cursable);
-                break;
-            case 2:
-                try {
-                    System.out.println(cursable.listarAsistencias());
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 3:
-                try {
-                    sesion.agregarPresente(cursable, elegirOpcion(cursable.getElegibles()));
-                } catch (NoSeEncontroElElementoException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo guardar la asistencia en la base de datos");
-                }
-                break;
-            case 4:
-                try {
-                    sesion.eliminarPresente(cursable, elegirOpcion(cursable.getElegibles()));
-                } catch (NoSeEncontroElElementoException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo guardar la asistencia en la base de datos");
-                }
-                break;
-            case 5:
-                break;
-        }
+            opcion = menu.Verificador.leerNumeroPositivoMinMax(1,5);
+            switch (opcion) {
+                case 1:
+                    tomarAsistenciaPersistida(cursable);
+                    break;
+                case 2:
+                    try {
+                        if (cursable instanceof Comision comision){
+                            System.out.println("Ingrese el mes a consultar: ");
+                            int mes = menu.Verificador.leerNumeroPositivoMinMax(1,12);
+                            int dia = menu.Verificador.pedirDiaSegunMes(mes, comision.getAnio());
+                            System.out.println(comision.listarAsistenciasxDia(LocalDate.of(comision.getAnio(), mes, dia)));
+                        }else{
+                        System.out.println(cursable.listarAsistencias());
+                        }
+                    } catch (AlumnosVacioException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 3:
+                    try {
+                        sesion.agregarPresente(cursable, elegirOpcion(cursable.getElegibles()));
+                    } catch (NoSeEncontroElElementoException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo guardar la asistencia en la base de datos");
+                    }
+                    break;
+                case 4:
+                    try {
+                        sesion.eliminarPresente(cursable, elegirOpcion(cursable.getElegibles()));
+                    } catch (NoSeEncontroElElementoException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo guardar la asistencia en la base de datos");
+                    }
+                    break;
+                case 5:
+                    break;
+            }
+        }while (opcion != 5);
     }
 
     // Terminado
     public void menuEditarMateria(Materia materia){
-        System.out.println("---EDITAR MATERIA---\n\n");
-        System.out.println("1 - Crear Cursable");
-        System.out.println("2 - Borrar Cursable");
-        System.out.println("3 - Cambiar Nombre");
-        System.out.println("4 - Editar Cursable");
-        System.out.println("5 - Atrás");
-        int opcion = leerNumeroPositivoMinMax(1,5);
+        int opcion;
+        do {
+            System.out.println("---EDITAR MATERIA---\n");
+            System.out.println("1 - Crear Cursable");
+            System.out.println("2 - Borrar Cursable");
+            System.out.println("3 - Cambiar Nombre");
+            System.out.println("4 - Editar Cursable");
+            System.out.println("5 - Atrás");
+            opcion = leerNumeroPositivoMinMax(1, 5);
 
-        switch (opcion){
-            case 1:
-                switch (materia.getTipoMateria()){
-                    case PARTICULAR:
+            switch (opcion) {
+                case 1:
+                    switch (materia.getTipoMateria()) {
+                        case PARTICULAR:
 
-                        try {
-                            sesion.agregarCursable(materia, crearClaseParticular());
-                        } catch (ElementoRepetidoException e) {
-                            System.out.println(e.getMessage());
-                        } catch (SQLException e) {
-                            System.out.println("No se pudo guardar la clase en la base de datos");
-                        }
-                        break;
+                            try {
+                                sesion.agregarCursable(materia, crearClaseParticular());
+                            } catch (ElementoRepetidoException e) {
+                                System.out.println(e.getMessage());
+                            } catch (SQLException e) {
+                                System.out.println("No se pudo guardar la clase en la base de datos");
+                            }
+                            break;
 
-                    case COMISIONADA:
-                        try {
-                            sesion.agregarCursable(materia, crearComision());
-                        }catch (ElementoRepetidoException e) {
-                            System.out.println(e.getMessage());
-                        } catch (SQLException e) {
-                            System.out.println("No se pudo guardar la comisión en la base de datos");
-                        }
-                }
-                break;
-            case 2:
-                try {
-                    sesion.darBajaCursable(materia, extraerElegibles(materia));
-                }catch (NoSeEncontroElElementoException e){
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo eliminar el cursable de la base de datos");
-                }
-                break;
-            case 3:
-                try {
-                    sesion.actualizarNombreMateria(materia, leerNombre("Escriba el nuevo nombre"));
-                } catch (SQLException e) {
-                    System.out.println("No se pudo actualizar la materia en la base de datos");
-                }
-                break;
-            case 4:
-                try {
-                    menuCursable(extraerElegibles(materia));
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            case 5:
-                break;
-        }
+                        case COMISIONADA:
+                            try {
+                                sesion.agregarCursable(materia, crearComision());
+                            } catch (ElementoRepetidoException e) {
+                                System.out.println(e.getMessage());
+                            } catch (SQLException e) {
+                                System.out.println("No se pudo guardar la comisión en la base de datos");
+                            }
+                    }
+                    break;
+                case 2:
+                    try {
+                        sesion.darBajaCursable(materia, extraerElegibles(materia));
+                    } catch (NoSeEncontroElElementoException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo eliminar el cursable de la base de datos");
+                    }
+                    break;
+                case 3:
+                    try {
+                        sesion.actualizarNombreMateria(materia, leerNombre("Escriba el nuevo nombre"));
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo actualizar la materia en la base de datos");
+                    }
+                    break;
+                case 4:
+                    try {
+                        menuCursable(extraerElegibles(materia));
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 5:
+                    break;
+            }
+        }while (opcion != 5);
 
     }
 
     // Terminado
     public void menuCursable(ICursable curso) {
-        System.out.println("--EDITAR CURSABLE--");
-        System.out.println("1 - Agregar Alumno");
-        System.out.println("2 - Eliminar Alumno");
-        System.out.println("3 - Cambiar Nombre");
-        System.out.println("4 - Atrás");
-        int opcion = leerNumeroPositivoMinMax(1, 4);
+        int opcion;
+        do {
+            System.out.println("--EDITAR CURSABLE--");
+            System.out.println("1 - Agregar Alumno");
+            System.out.println("2 - Eliminar Alumno");
+            System.out.println("3 - Cambiar Nombre");
+            System.out.println("4 - Atrás");
+            opcion = leerNumeroPositivoMinMax(1, 4);
 
-        switch (opcion) {
-            case 1:
-                try {
-                    sesion.agregarAlumnoACursable(
-                            curso, elegirOpcion(sesion.getAlumnosElegibles()));
-                } catch (ElementoRepetidoException e) {
-                    System.out.println(e.getMessage());
-                } catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo guardar el alumno en la base de datos");
-                }
-                break;
-            case 2:
-                try {
-                    sesion.eliminarAlumnoDeCursable(
-                            curso, elegirOpcion(sesion.getAlumnosElegibles()));
-                }catch (NoSeEncontroElElementoException e){
-                    System.out.println(e.getMessage());
-                }catch (AlumnosVacioException e) {
-                    System.out.println(e.getMessage());
-                } catch (SinElementosException e) {
-                    System.out.println(e.getMessage());
-                } catch (SQLException e) {
-                    System.out.println("No se pudo eliminar el alumno de la base de datos");
-                }
-                break;
-            case 3:
-                try {
-                    sesion.actualizarNombreCursable(
-                            curso, menu.Verificador.leerNombre("Escriba el nuevo nombre"));
-                } catch (SQLException e) {
-                    System.out.println("No se pudo actualizar el cursable en la base de datos");
-                }
-                break;
-            case 4:
-                break;
-        }
+            switch (opcion) {
+                case 1:
+                    try {
+                        sesion.agregarAlumnoACursable(
+                                curso, elegirOpcion(sesion.getAlumnosElegibles()));
+                    } catch (ElementoRepetidoException e) {
+                        System.out.println(e.getMessage());
+                    } catch (AlumnosVacioException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo guardar el alumno en la base de datos");
+                    }
+                    break;
+                case 2:
+                    try {
+                        sesion.eliminarAlumnoDeCursable(
+                                curso, elegirOpcion(sesion.getAlumnosElegibles()));
+                    } catch (NoSeEncontroElElementoException e) {
+                        System.out.println(e.getMessage());
+                    } catch (AlumnosVacioException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SinElementosException e) {
+                        System.out.println(e.getMessage());
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo eliminar el alumno de la base de datos");
+                    }
+                    break;
+                case 3:
+                    try {
+                        sesion.actualizarNombreCursable(
+                                curso, menu.Verificador.leerNombre("Escriba el nuevo nombre"));
+                    } catch (SQLException e) {
+                        System.out.println("No se pudo actualizar el cursable en la base de datos");
+                    }
+                    break;
+                case 4:
+                    break;
+            }
+        }while (opcion != 4);
     }
 
     // Eureka 4.0
@@ -338,7 +360,7 @@ public class Menu {
         System.out.println("Seleccione una opcion: \n");
 
         for (T generiquito : lista){
-            System.out.println(numero++ + " - " + generiquito.getNombre());
+            System.out.println(numero++ + " - " + generiquito.getNombreElegible());
         }
         // Actualización, volví a entender todo
         // EUREKA 2.0
@@ -440,6 +462,7 @@ public class Menu {
     public Comision crearComision(){
 
         String nombre = menu.Verificador.leerNombre("Ingrese el nombre de la comision: ");
+        System.out.println("Ingrese año de la cursada: ");
         int anio = menu.Verificador.leerNumeroPositivoMinMax(2026,2050);
 
         return new Comision(nombre, anio);
@@ -453,7 +476,7 @@ public class Menu {
 
         System.out.println("Ingrese el mes(1/12): ");
         int mes = menu.Verificador.leerNumeroPositivoMinMax(1,12);
-        int dia = menu.Verificador.pedirDiaSegunMes(mes);
+        int dia = menu.Verificador.pedirDiaSegunMes(mes, queAnioEs());
 
         String nombre = menu.Verificador.leerNombre("Ingrese el nombre del materia: ");
 
@@ -475,7 +498,7 @@ public class Menu {
         } catch (ElementoRepetidoException e) {
             System.out.println(e.getMessage());
         } catch (SQLException e) {
-            System.out.println("No se pudo guardar el alumno en la base de datos");
+            System.out.println("No se pudo guardar el alumno en la base de datos " +  e.getMessage());
         }
     }
 

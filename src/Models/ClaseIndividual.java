@@ -135,6 +135,10 @@ public class ClaseIndividual implements ICursable {
         this.fechaYHora = fechaYHora;
     }
 
+    public String getNombreElegible() {
+        return nombre;
+    }
+
     public String getNombre() {
         return nombre;
     }

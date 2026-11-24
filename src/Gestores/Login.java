@@ -14,7 +14,7 @@ public class Login {
             System.out.println("---BIENVENIDO---\n");
             System.out.println("1 - Iniciar Sesion");
             System.out.println("2 - Registrarse");
-            System.out.println("3 - Salir\n");
+            System.out.println("3 - Salir");
 
             switch (menu.Verificador.leerNumeroPositivoMinMax(1, 3)) {
                 case 1: {

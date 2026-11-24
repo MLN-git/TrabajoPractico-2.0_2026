@@ -1,6 +1,6 @@
 package Interfaces;
 
 public interface ITieneNombre {
-    public String getNombre();
+    public String getNombreElegible();
     public void setNombre(String nombre);
 }

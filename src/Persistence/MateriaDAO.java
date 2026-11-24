@@ -20,7 +20,7 @@ public class MateriaDAO {
              PreparedStatement ps = conexion.prepareStatement(sql)) {
             ps.setString(1, materia.getId().toString());
             ps.setString(2, usuarioId.toString());
-            ps.setString(3, materia.getNombre());
+            ps.setString(3, materia.getNombreElegible());
             ps.setString(4, materia.getTipoMateria().name());
             ps.executeUpdate();
         }
@@ -88,7 +88,7 @@ public class MateriaDAO {
                 for (Materia materia : materias) {
                     ps.setString(1, materia.getId().toString());
                     ps.setString(2, usuarioId.toString());
-                    ps.setString(3, materia.getNombre());
+                    ps.setString(3, materia.getNombreElegible());
                     ps.setString(4, materia.getTipoMateria().name());
                     ps.addBatch();
                 }

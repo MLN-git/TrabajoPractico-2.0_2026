@@ -33,7 +33,7 @@ public class ComisionDAO {
                 psCursable.setString(1, comision.getId().toString());
                 psCursable.setString(2, materiaId.toString());
                 psCursable.setString(3, "COMISIONADA");
-                psCursable.setString(4, comision.getNombre());
+                psCursable.setString(4, comision.getNombreElegible());
                 psCursable.executeUpdate();
 
                 psComision.setString(1, comision.getId().toString());

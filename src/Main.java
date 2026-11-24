@@ -1,16 +1,21 @@
 import Gestores.Gestora;
 import Gestores.Login;
+import Gestores.Menu;
 import Models.Usuario;
+import Persistence.ConexionDB;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
         try {
+
             Usuario user = new Login().pantallaInicial();
 
         if (user != null){
             Gestora sesion = new Gestora(user);
+            Menu menu = new Menu(sesion);
+            menu.mostrarMenu();
         }
 
     } catch (SQLException e) {

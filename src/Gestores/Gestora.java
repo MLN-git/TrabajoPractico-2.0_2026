@@ -46,7 +46,7 @@ public class Gestora implements IElegible<Materia> {
     public String listarMaterias() {
         StringBuilder materias = new StringBuilder();
         for (Materia materia : materiasExistentes) {
-            materias.append("Nombre: ").append(materia.getNombre()).append("\n");
+            materias.append("Nombre: ").append(materia.getNombreElegible()).append("\n");
         }
         return materias.toString();
     }

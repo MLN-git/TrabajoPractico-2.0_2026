@@ -59,8 +59,11 @@ public class Materia implements IElegible<ICursable>, ITieneNombre {
         return id;
     }
 
-
     public String getNombre() {
+        return nombre;
+    }
+
+    public String getNombreElegible() {
         return nombre;
     }
 

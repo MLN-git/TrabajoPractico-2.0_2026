@@ -7,10 +7,10 @@ import java.sql.Statement;
 
 public final class ConexionDB {
     private static final String BASE_DATOS = "TPFinal_2026_ManuIgna";
-    private static final String URL_SERVIDOR = "jdbc:mysql://localhost:3306/";
+    private static final String URL_SERVIDOR = "jdbc:mysql://172.16.1.64:3306/";
     private static final String URL = URL_SERVIDOR + BASE_DATOS;
-    private static final String USER = "root";
-    private static final String PASSWORD = "root";
+    private static final String USER = "bdd1";
+    private static final String PASSWORD = "bdd1";
     private static boolean inicializada;
 
     private ConexionDB() {

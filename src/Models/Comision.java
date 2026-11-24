@@ -74,6 +74,19 @@ public class Comision implements ICursable{
         return s.toString();
     }
 
+    public String listarAsistenciasxDia(LocalDate date) throws AlumnosVacioException {
+        HashSet<Alumno> asistenciaHoy = asistencias.get(date);
+        if (asistenciaHoy == null || asistenciaHoy.isEmpty()) {
+            throw new AlumnosVacioException("Nadie asistió todavía");
+        }
+        StringBuilder s = new StringBuilder();
+        for (Alumno alumno : asistenciaHoy) {
+            s.append(alumno.nombreCompleto());
+            s.append("\n");
+        }
+        return s.toString();
+    }
+
     @Override
     public void agregarPresente(Alumno alumno) throws NoSeEncontroElElementoException {
         if (!alumnos.contains(alumno)) {
@@ -128,7 +141,11 @@ public class Comision implements ICursable{
         return Objects.hashCode(id);
     }
 
-    public String getNombre() {
+    public String getNombreElegible() {
+        return nombreComision;
+    }
+
+    public String getNombreComision() {
         return nombreComision;
     }
 

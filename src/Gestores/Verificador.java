@@ -1,5 +1,7 @@
 package menu;
 
+import Models.Comision;
+
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.InputMismatchException;
@@ -113,11 +115,11 @@ public class Verificador {
             System.out.println(msg);
             nombre = scanner.nextLine().trim();
 
-            if (!nombre.isEmpty() && nombre.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ]+")) {
+            if (!nombre.isEmpty() && nombre.matches("[a-z0-9A-ZáéíóúÁÉÍÓÚñÑ]+")) {
                 //Por si ponen con acentos
                 return nombre;
             } else {
-                System.out.println("El nombre solo debe contener letras.");
+                System.out.println("El nombre solo debe contener letras y numeros.");
             }
 
         } while (true);
@@ -182,8 +184,8 @@ public class Verificador {
         return LocalDate.now().getYear();
     }
 
-    public static int pedirDiaSegunMes(int mes){
-        int maxDia = YearMonth.of(queAnioEs(), mes).lengthOfMonth();
+    public static int pedirDiaSegunMes(int mes, int anio){
+        int maxDia = YearMonth.of(anio, mes).lengthOfMonth();
 
         System.out.println("Ingrese el dia del mes: ");
         return Verificador.leerNumeroPositivoMinMax(1, maxDia);

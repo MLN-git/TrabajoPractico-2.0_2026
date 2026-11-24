@@ -44,6 +44,10 @@ public class Alumno implements ITieneNombre {
         return id;
     }
 
+    public String getNombreElegible() {
+        return nombre + ' ' +  apellido;
+    }
+
     public String getNombre() {
         return nombre;
     }

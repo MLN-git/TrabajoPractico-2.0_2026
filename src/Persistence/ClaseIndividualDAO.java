@@ -34,7 +34,7 @@ public class ClaseIndividualDAO {
                 psCursable.setString(1, clase.getId().toString());
                 psCursable.setString(2, materiaId.toString());
                 psCursable.setString(3, "INDIVIDUAL");
-                psCursable.setString(4, clase.getNombre());
+                psCursable.setString(4, clase.getNombreElegible());
                 psCursable.executeUpdate();
 
                 psClase.setString(1, clase.getId().toString());
